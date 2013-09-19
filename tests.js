@@ -1,6 +1,7 @@
 "use scrict";
 
-var Sequelize = require("sequelize"),
+var Promise = require("promise"),
+    Sequelize = require("sequelize"),
     assert = require("assert"),
     sequelizeG = require("./index.js");
 
@@ -46,25 +47,31 @@ describe("Sequelize generator", function () {
     });
 
     it("should instantiate a child model and automatically the multiple parents it belongs to", function (done) {
-        var ModelParentA = sequelize.define("ModelParentA", {}),
-            ModelParentB = sequelize.define("ModelParentB", {}),
-            ModelChild = sequelize.define("ModelChild", {});
+        var ModelChild = sequelize.define("ModelChild", {}),
+            parentModels = new Array(10),
+            parentModelsLength = parentModels.length;
 
-        ModelChild.belongsTo(ModelParentA);
-        ModelChild.belongsTo(ModelParentB);
+        for (var i = 0; i < parentModelsLength; i++) {
+            var ModelParent = sequelize.define("ModelParent" + i, {});
+
+            parentModels[i] = ModelParent;
+
+            ModelChild.belongsTo(ModelParent);
+        }
 
         sync().then(function () {
             return sequelizeG(ModelChild).then(function (modelChild) {
-                return modelChild.getModelParentA().then(function (modelParentA) {
-                    assert.ok(modelParentA.daoFactoryName === ModelParentA.name);
+                return Promise.all(parentModels.map(function (ParentModel, i) {
+                    return modelChild["getModelParent" + i]().then(function (modelParentI) {
+                        assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
 
-                    return modelChild;
-                });
-            }).then(function (modelChild) {
-                return modelChild.getModelParentB().then(function (modelParentB) {
-                    assert.ok(modelParentB.daoFactoryName === ModelParentB.name);
-                });
+                        return i;
+                    });
+                }));
             });
-        }).then(done, done);
+        }).then(function (is) {
+            assert.equal(parentModelsLength, is.length);
+            done();
+        }, done);
     });
 });
