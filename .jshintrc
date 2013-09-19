@@ -1,4 +1,9 @@
 {
+    "globals": {
+        "describe": false,
+        "it": false
+    },
+
     "boss": true,
     "camelcase": true,
     "curly": true,
