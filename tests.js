@@ -1,9 +1,10 @@
 "use scrict";
 
-var Promise = require("promise"),
+var _ = require("lodash"),
     Sequelize = require("sequelize"),
+    SequelizeG = require("./index.js")
     assert = require("assert"),
-    SequelizeG = require("./index.js");
+    when = require("when");
 
 var sequelize = new Sequelize("sequelize_generator",
     "root",
@@ -61,7 +62,7 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (modelChild) {
-                return Promise.all(parentModels.map(function (ParentModel, i) {
+                return when.all(parentModels.map(function (ParentModel, i) {
                     return modelChild["getModelParent" + i]().then(function (modelParentI) {
                         assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
 
@@ -96,5 +97,35 @@ describe("Sequelize generator", function () {
                 });
             });
         }).then(done, done);
+    });
+
+    it("should instantiate a child model, and several of its ancestor generations", function (done) {
+        var modelsGenerations = [sequelize.define("Model0", {})],
+            additionalModelsNumber = 9;
+
+        for (var i = 1; i < additionalModelsNumber + 1; i++) {
+            var Model = sequelize.define("Model" + i, {}),
+                previousModel = modelsGenerations[i - 1];
+
+            modelsGenerations[i] = Model;
+
+            previousModel.belongsTo(Model);
+        }
+
+        sync().then(function () {
+            return new SequelizeG(modelsGenerations[0]).then(function (model0) {
+                return when.reduce(modelsGenerations, function (currentResult, value, index, total) {
+                    if (index < total - 1) {
+                        assert.ok(currentResult.daoFactoryName === value.name);
+                        return currentResult["getModel" + (index + 1)]();
+                    } else {
+                        return total;
+                    }
+                }, model0);
+            });
+        }).then(function (total) {
+            assert.equal(additionalModelsNumber + 1, total);
+            done();
+        }, done);
     });
 });

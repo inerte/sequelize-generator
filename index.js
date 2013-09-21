@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require("lodash"),
-    Promise = require("promise");
+    when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
     options = options || {};
@@ -12,7 +12,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             return sequelizeModelOrInstance.create();
         } else {
             // It is already an instance, not a model, so wrap it as a promise
-            return Promise.from(sequelizeModelOrInstance);
+            return when(sequelizeModelOrInstance);
         }
     }
 
@@ -26,14 +26,14 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         if (_.isEmpty(targets)) {
             return instance;
         } else {
-            return Promise.all(targets.map(function (target) {
+            return when.all(targets.map(function (target) {
                 return target.create().then(function (targetInstance) {
                     return instance["set" + target.name](targetInstance).then(function () {
                         return targetInstance;
                     });
                 });
             })).then(function (targetInstances) {
-                return Promise.all(targetInstances.map(function (targetInstance) {
+                return when.all(targetInstances.map(function (targetInstance) {
                     if (!_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {
