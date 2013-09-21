@@ -26,14 +26,14 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         if (_.isEmpty(targets)) {
             return instance;
         } else {
-            return new Promise.all(targets.map(function (target) {
+            return Promise.all(targets.map(function (target) {
                 return target.create().then(function (targetInstance) {
                     return instance["set" + target.name](targetInstance).then(function () {
                         return targetInstance;
                     });
                 });
             })).then(function (targetInstances) {
-                return new Promise.all(targetInstances.map(function (targetInstance) {
+                return Promise.all(targetInstances.map(function (targetInstance) {
                     if (!_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {

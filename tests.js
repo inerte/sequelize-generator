@@ -61,7 +61,7 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (modelChild) {
-                return new Promise.all(parentModels.map(function (ParentModel, i) {
+                return Promise.all(parentModels.map(function (ParentModel, i) {
                     return modelChild["getModelParent" + i]().then(function (modelParentI) {
                         assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
 
