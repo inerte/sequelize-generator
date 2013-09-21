@@ -3,7 +3,7 @@
 var Promise = require("promise"),
     Sequelize = require("sequelize"),
     assert = require("assert"),
-    sequelizeG = require("./index.js");
+    SequelizeG = require("./index.js");
 
 var sequelize = new Sequelize("sequelize_generator",
     "root",
@@ -25,7 +25,7 @@ describe("Sequelize generator", function () {
         var ModelWithoutRelationship = sequelize.define("modelWithoutRelationship", {});
 
         sync().then(function () {
-            return sequelizeG(ModelWithoutRelationship).then(function (modelChild) {
+            return new SequelizeG(ModelWithoutRelationship).then(function (modelChild) {
                 assert.ok(modelChild.daoFactoryName === ModelWithoutRelationship.name);
             });
         }).then(done, done);
@@ -38,7 +38,7 @@ describe("Sequelize generator", function () {
         ModelChild.belongsTo(ModelParent);
 
         sync().then(function () {
-            return sequelizeG(ModelChild).then(function (modelChild) {
+            return new SequelizeG(ModelChild).then(function (modelChild) {
                 return modelChild.getModelParent().then(function (modelParent) {
                     assert.ok(modelParent.daoFactoryName === ModelParent.name);
                 });
@@ -60,7 +60,7 @@ describe("Sequelize generator", function () {
         }
 
         sync().then(function () {
-            return sequelizeG(ModelChild).then(function (modelChild) {
+            return new SequelizeG(ModelChild).then(function (modelChild) {
                 return Promise.all(parentModels.map(function (ParentModel, i) {
                     return modelChild["getModelParent" + i]().then(function (modelParentI) {
                         assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
@@ -73,5 +73,28 @@ describe("Sequelize generator", function () {
             assert.equal(parentModelsLength, is.length);
             done();
         }, done);
+    });
+
+    it("should instantiate a child model, its parent, and its grandparent", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+        ModelParent.belongsTo(ModelGrandParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (modelChild) {
+                return modelChild.getModelParent().then(function (modelParent) {
+                    assert.ok(modelParent.daoFactoryName === ModelParent.name);
+
+                    return modelParent;
+                });
+            }).then(function (modelParent) {
+                return modelParent.getModelGrandParent().then(function (modelGrandParent) {
+                    assert.ok(modelGrandParent.daoFactoryName === ModelGrandParent.name);
+                });
+            });
+        }).then(done, done);
     });
 });
