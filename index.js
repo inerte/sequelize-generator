@@ -17,7 +17,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     return instanceIfNeeded(sequelizeModelOrInstance).then(function (instance) {
-        // Since G is recursice, options.rootInstance keeps track of what should be ultimately returned
+        // Since G is recursive, options.rootInstance keeps track of what should be ultimately returned
         if (!options.rootInstance) {
             options.rootInstance = instance;
         }
