@@ -65,7 +65,7 @@ describe("Sequelize generator", function () {
                     return modelChild["getModelParent" + i]().then(function (modelParentI) {
                         assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
 
-                        return i;
+                        return i; // Used as a counter on the length assert below
                     });
                 }));
             });
