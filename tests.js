@@ -39,9 +39,9 @@ describe("Sequelize generator", function () {
         ModelChild.belongsTo(ModelParent);
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (modelChild) {
-                return modelChild.getModelParent().then(function (modelParent) {
-                    assert.ok(modelParent.daoFactoryName === ModelParent.name);
+            return new SequelizeG(ModelChild).then(function (child) {
+                return child.getModelParent().then(function (parent) {
+                    assert.ok(parent.daoFactoryName === ModelParent.name);
                 });
             });
         }).then(done, done);
@@ -61,10 +61,10 @@ describe("Sequelize generator", function () {
         }
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (modelChild) {
+            return new SequelizeG(ModelChild).then(function (child) {
                 return when.all(parentModels.map(function (ParentModel, i) {
-                    return modelChild["getModelParent" + i]().then(function (modelParentI) {
-                        assert.ok(modelParentI.daoFactoryName === parentModels[i].name);
+                    return child["getModelParent" + i]().then(function (parentI) {
+                        assert.ok(parentI.daoFactoryName === parentModels[i].name);
 
                         return i; // Used as a counter on the length assert below
                     });
@@ -85,15 +85,15 @@ describe("Sequelize generator", function () {
         ModelParent.belongsTo(ModelGrandParent);
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (modelChild) {
-                return modelChild.getModelParent().then(function (modelParent) {
-                    assert.ok(modelParent.daoFactoryName === ModelParent.name);
+            return new SequelizeG(ModelChild).then(function (child) {
+                return child.getModelParent().then(function (parent) {
+                    assert.ok(parent.daoFactoryName === ModelParent.name);
 
-                    return modelParent;
+                    return parent;
                 });
-            }).then(function (modelParent) {
-                return modelParent.getModelGrandParent().then(function (modelGrandParent) {
-                    assert.ok(modelGrandParent.daoFactoryName === ModelGrandParent.name);
+            }).then(function (parent) {
+                return parent.getModelGrandParent().then(function (grandParent) {
+                    assert.ok(grandParent.daoFactoryName === ModelGrandParent.name);
                 });
             });
         }).then(done, done);
