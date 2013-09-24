@@ -128,4 +128,55 @@ describe("Sequelize generator", function () {
             done();
         }, done);
     });
+
+    it("should instantiate a child model, both parents, and 4 grandparents (paternal and maternal)", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelFather = sequelize.define("ModelFather", {}),
+            ModelMother = sequelize.define("ModelMother", {}),
+            ModelPaternalGrandFather = sequelize.define("ModelPaternalGrandFather", {}),
+            ModelPaternalGrandMother = sequelize.define("ModelPaternalGrandMother", {}),
+            ModelMaternalGrandFather = sequelize.define("ModelMaternalGrandFather", {}),
+            ModelMaternalGrandMother = sequelize.define("ModelMaternalGrandMother", {});
+
+        ModelChild.belongsTo(ModelFather);
+        ModelChild.belongsTo(ModelMother);
+
+        ModelFather.belongsTo(ModelPaternalGrandFather);
+        ModelFather.belongsTo(ModelPaternalGrandMother);
+
+        ModelMother.belongsTo(ModelMaternalGrandFather);
+        ModelMother.belongsTo(ModelMaternalGrandMother);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                // Check father and paternal grandparents
+                return child.getModelFather().then(function (father) {
+                    assert.ok(father.daoFactoryName === ModelFather.name);
+                    return father.getModelPaternalGrandFather().then(function (paternalGrandFather) {
+                        assert.ok(paternalGrandFather.daoFactoryName === ModelPaternalGrandFather.name);
+
+                        return father.getModelPaternalGrandMother();
+                    }).then(function (paternalGrandMother) {
+                        assert.ok(paternalGrandMother.daoFactoryName === ModelPaternalGrandMother.name);
+
+                        return child;
+                    });
+                }).then(function (child) {
+                    // Check mother and maternal grandparents
+                    return child.getModelMother().then(function (mother) {
+                        assert.ok(mother.daoFactoryName === ModelMother.name);
+                        return mother.getModelMaternalGrandFather().then(function (maternalGrandFather) {
+                            assert.ok(maternalGrandFather.daoFactoryName === ModelMaternalGrandFather.name);
+
+                            return mother.getModelMaternalGrandMother();
+                        }).then(function (maternalGrandMother) {
+                            assert.ok(maternalGrandMother.daoFactoryName === ModelMaternalGrandMother.name);
+
+                            return null;
+                        });
+                    });
+                });
+            });
+        }).then(done, done);
+    });
 });
