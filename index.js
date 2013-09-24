@@ -9,7 +9,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     function instanceIfNeeded() {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
-            return sequelizeModelOrInstance.create();
+            return sequelizeModelOrInstance.create(options.attributes);
         } else {
             // It is already an instance, not a model, so wrap it as a promise
             return when(sequelizeModelOrInstance);

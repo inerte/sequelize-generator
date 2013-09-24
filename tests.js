@@ -179,4 +179,20 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should set attributes for Model", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING,
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                attributes: {
+                    name: "Julio Nobrega Netto"
+                }
+            }).then(function (child) {
+                assert.equal(child.name, "Julio Nobrega Netto");
+            });
+        }).then(done, done);
+    });
 });
