@@ -195,4 +195,54 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should set attributes for parent model", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {
+                name: Sequelize.STRING,
+            });
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                ModelParent: {
+                    attributes: {
+                        name: "José Nobrega Netto"
+                    }
+                }
+            }).then(function (child) {
+                return child.getModelParent();
+            }).then(function (parent) {
+                assert.equal(parent.name, "José Nobrega Netto");
+            });
+        }).then(done, done);
+    });
+
+    it("should set attributes for grandparent model", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {
+                name: Sequelize.STRING,
+            });
+
+        ModelChild.belongsTo(ModelParent);
+        ModelParent.belongsTo(ModelGrandParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                ModelGrandParent: {
+                    attributes: {
+                        name: "Julio Nobrega" // notice the lack of Netto
+                    }
+                }
+            }).then(function (child) {
+                return child.getModelParent();
+            }).then(function (parent) {
+                return parent.getModelGrandParent();
+            }).then(function (grandParent) {
+                assert.equal(grandParent.name, "Julio Nobrega");
+            });
+        }).then(done, done);
+    });
 });

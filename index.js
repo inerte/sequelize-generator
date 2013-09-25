@@ -27,7 +27,9 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             return instance;
         } else {
             return when.all(targets.map(function (target) {
-                return target.create().then(function (targetInstance) {
+                var targetAttributes = options[target.name] && options[target.name].attributes || {};
+
+                return target.create(targetAttributes).then(function (targetInstance) {
                     return instance["set" + target.name](targetInstance).then(function () {
                         return targetInstance;
                     });
