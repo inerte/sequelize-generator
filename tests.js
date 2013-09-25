@@ -1,8 +1,7 @@
 "use scrict";
 
-var _ = require("lodash"),
-    Sequelize = require("sequelize"),
-    SequelizeG = require("./index.js")
+var Sequelize = require("sequelize"),
+    SequelizeG = require("./index.js"),
     assert = require("assert"),
     when = require("when");
 
