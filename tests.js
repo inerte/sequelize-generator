@@ -1,5 +1,3 @@
-"use strict";
-
 var _ = require("lodash"),
     Sequelize = require("sequelize"),
     SequelizeG = require("./index.js"),
