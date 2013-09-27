@@ -1,4 +1,4 @@
-"use scrict";
+"use strict";
 
 var _ = require("lodash"),
     Sequelize = require("sequelize"),
