@@ -1,0 +1,41 @@
+{
+    "name": "sequelize-generator",
+    "version": "0.0.1",
+    "description": "Helper to create sequelize objects",
+    "author": {
+        "name": "Julio Nobrega Netto",
+        "email": "inerte@gmail.com",
+        "url": "http://inerciasensorial.com.br"
+    },
+    "bugs": "https://github.com/inerte/sequelize-generator/issues",
+    "engines": {
+        "node": ">=0.10.11"
+    },
+    "dependencies": {
+        "lodash": "~2.0.0",
+        "sequelize": "~2.0.0-beta.0",
+        "when": "~2.4.0"
+    },
+    "devDependencies": {
+        "jshint": "~2.1.3",
+        "mocha": "~1.13.0",
+        "mysql": "~2.0.0-alpha8"
+    },
+    "homepage": "https://github.com/inerte/sequelize-generator",
+    "keywords": [
+        "sequelize",
+        "orm",
+        "object relational mapper"
+    ],
+    "license": "MIT",
+    "main": "index",
+    "readmeFilename": "README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/inerte/sequelize-generator.git"
+    },
+    "scripts": {
+        "lint": "node_modules/.bin/jshint *.js",
+        "test": "./node_modules/.bin/mocha tests.js"
+    }
+}
