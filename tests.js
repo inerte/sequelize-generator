@@ -244,7 +244,7 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
-    it("should populate INTEGER data type fields with integers", function (done) {
+    it("should populate INTEGER data type fields with integers on child model", function (done) {
         var Model = sequelize.define("Model", {
             number: Sequelize.INTEGER
         });
@@ -252,6 +252,23 @@ describe("Sequelize generator", function () {
         sync().then(function () {
             return new SequelizeG(Model).then(function (instance) {
                 assert.ok(_.isNumber(instance.number));
+            });
+        }).then(done, done);
+    });
+
+    it("should populate INTEGER data type fields with integers on parent models", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {
+                number: Sequelize.INTEGER
+            });
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                return child.getModelParent();
+            }).then(function (parent) {
+                assert.ok(_.isNumber(parent.number));
             });
         }).then(done, done);
     });

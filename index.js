@@ -9,14 +9,22 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         attributes: {}
     };
 
+    function setDefaultAttributesValue(rawAttributes) {
+        var attributes = {};
+
+        _.forEach(rawAttributes, function (value, key) {
+            if (value === Sequelize.INTEGER) {
+                attributes[key] = _.parseInt(_.uniqueId(), 10);
+            }
+        });
+
+        return attributes;
+    }
+
     function instanceIfNeeded() {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
-            _.forEach(sequelizeModelOrInstance.rawAttributes, function (value, key) {
-                if (value === Sequelize.INTEGER) {
-                    options.attributes[key] = _.parseInt(_.uniqueId(), 10);
-                }
-            });
+            options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes);
 
             return sequelizeModelOrInstance.create(options.attributes);
         } else {
@@ -37,6 +45,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         } else {
             return when.all(targets.map(function (target) {
                 var targetAttributes = options[target.name] && options[target.name].attributes || {};
+
+                targetAttributes = setDefaultAttributesValue(target.rawAttributes);
 
                 return target.create(targetAttributes).then(function (targetInstance) {
                     return instance["set" + target.name](targetInstance).then(function () {
