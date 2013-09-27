@@ -1,14 +1,23 @@
 "use strict";
 
 var _ = require("lodash"),
+    Sequelize = require("sequelize"),
     when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
-    options = options || {};
+    options = options || {
+        attributes: {}
+    };
 
     function instanceIfNeeded() {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
+            _.forEach(sequelizeModelOrInstance.rawAttributes, function (value, key) {
+                if (value === Sequelize.INTEGER) {
+                    options.attributes[key] = _.parseInt(_.uniqueId(), 10);
+                }
+            });
+
             return sequelizeModelOrInstance.create(options.attributes);
         } else {
             // It is already an instance, not a model, so wrap it as a promise

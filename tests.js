@@ -1,6 +1,7 @@
 "use scrict";
 
-var Sequelize = require("sequelize"),
+var _ = require("lodash"),
+    Sequelize = require("sequelize"),
     SequelizeG = require("./index.js"),
     assert = require("assert"),
     when = require("when");
@@ -241,6 +242,18 @@ describe("Sequelize generator", function () {
                 return parent.getModelGrandParent();
             }).then(function (grandParent) {
                 assert.equal(grandParent.name, "Julio Nobrega");
+            });
+        }).then(done, done);
+    });
+
+    it("should populate INTEGER data type fields with integers", function (done) {
+        var Model = sequelize.define("Model", {
+            number: Sequelize.INTEGER
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isNumber(instance.number));
             });
         }).then(done, done);
     });
