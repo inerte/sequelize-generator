@@ -12,11 +12,15 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     function setDefaultAttributesValue(rawAttributes, customValues) {
         var attributes = customValues || {};
 
-        _.forEach(rawAttributes, function (value, key) {
+        _(rawAttributes)
+        // Removes from rawAttributes any attributes from customValues. We want user-passed values to take precedence
+        .omit(_.keys(customValues))
+        // Loop the remaining rawAttributes to set values according to its Sequelize data type
+        .forEach(function (value, key) {
             if (value === Sequelize.INTEGER) {
                 attributes[key] = _.parseInt(_.uniqueId(), 10);
             }
-        });
+        }).value();
 
         return attributes;
     }

@@ -272,4 +272,35 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should not populate INTEGER data type field on child and parents if set as attributes", function (done) {
+        var childNumber = _.uniqueId(),
+            parentNumber = _.uniqueId(),
+            ModelChild = sequelize.define("ModelChild", {
+                number: Sequelize.INTEGER
+            }),
+            ModelParent = sequelize.define("ModelParent", {
+                number: Sequelize.INTEGER
+            });
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                attributes: {
+                    number: childNumber
+                },
+                ModelParent: {
+                    attributes: {
+                        number: parentNumber
+                    }
+                }
+            }).then(function (child) {
+                assert.equal(child.number, childNumber);
+                return child.getModelParent();
+            }).then(function (parent) {
+                assert.equal(parent.number, parentNumber);
+            });
+        }).then(done, done);
+    });
 });
