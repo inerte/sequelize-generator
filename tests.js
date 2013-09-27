@@ -4,8 +4,8 @@ var _ = require("lodash"),
     assert = require("assert"),
     when = require("when");
 
-var sequelize = new Sequelize("sequelize_generator",
-    "root",
+var sequelize = new Sequelize("myapp_test",
+    "travis",
     "", {
         dialect: "mysql",
         logging: false
