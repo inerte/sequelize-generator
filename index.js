@@ -42,17 +42,33 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         if (!options.rootInstance) {
             options.rootInstance = instance;
         }
-        var targets = _.pluck(instance.daoFactory.associations, "target");
 
-        if (_.isEmpty(targets)) {
+        var associations = instance.daoFactory.associations;
+
+        if (_.isEmpty(associations)) {
             return instance;
         } else {
-            return when.all(targets.map(function (target) {
-                var targetAttributes = options[target.name] && options[target.name].attributes || {};
+            return when.all(_.map(associations, function (value) {
+                var target = value.target,
+                    targetAttributes = options[target.name] && options[target.name].attributes || {},
+                    targetInstancePromise;
 
                 targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes);
 
-                return target.create(targetAttributes).then(function (targetInstance) {
+                if (options[target.name] && options[target.name] === "any") {
+                    targetInstancePromise = target.findAll().then(function (targetInstances) {
+                        return _.sample(targetInstances);
+                    });
+                } else {
+                    // If the target identifier was passed as an atribute of instance, try to get the
+                    // existing record from the database. In other words, the foreign key value is set.
+                    // Otherwise, create the instance.
+                    targetInstancePromise = target.findOrCreate({
+                        id: options.attributes[value.identifier] || null
+                    }, targetAttributes);
+                }
+
+                return targetInstancePromise.then(function (targetInstance) {
                     return instance["set" + target.name](targetInstance).then(function () {
                         return targetInstance;
                     });

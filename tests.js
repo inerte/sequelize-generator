@@ -306,16 +306,16 @@ describe("Sequelize generator", function () {
 
     it("should populate fields when the column is specified as an object", function (done) {
         var Model = sequelize.define("Model", {
-            number_1: Sequelize.INTEGER,
-            number_2: {
+            number1: Sequelize.INTEGER,
+            number2: {
                 type: Sequelize.INTEGER
             }
         });
 
         sync().then(function () {
             return new SequelizeG(Model).then(function (model) {
-                assert.ok(_.isNumber(model.number_1));
-                assert.ok(_.isNumber(model.number_2));
+                assert.ok(_.isNumber(model.number1));
+                assert.ok(_.isNumber(model.number2));
             });
         }).then(done, done);
     });
@@ -332,6 +332,50 @@ describe("Sequelize generator", function () {
                 }
             }).then(function (model) {
                 assert.ok(_.isNull(model.number));
+            });
+        }).then(done, done);
+    });
+
+    it("should accept as an attribute a foreign key of an already created instance", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return ModelParent.create();
+        }).then(function (parent) {
+            return new SequelizeG(ModelChild, {
+                attributes: {
+                    ModelParentId: parent.id
+                }
+            }).then(function (child) {
+                assert.equal(parent.id, child.ModelParentId);
+            });
+        }).then(done, done);
+    });
+
+    it("should set a foreign key to a random, already created record, if option is set", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            var chainer = new Sequelize.Utils.QueryChainer();
+
+            _.times(3, function () {
+                chainer.add(ModelParent.create());
+            });
+
+            return chainer.run();
+        }).then(function (parents) {
+            var parentIds = _.pluck(parents, "id");
+
+            return new SequelizeG(ModelChild, {
+                ModelParent: "any"
+            }).then(function (child) {
+                assert.ok(_.contains(parentIds, child.ModelParentId));
             });
         }).then(done, done);
     });
