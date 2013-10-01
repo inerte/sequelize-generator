@@ -303,4 +303,20 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should populate fields when the column is specified as an object", function (done) {
+        var Model = sequelize.define("Model", {
+            number_1: Sequelize.INTEGER,
+            number_2: {
+                type: Sequelize.INTEGER
+            }
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (model) {
+                assert.ok(_.isNumber(model.number_1));
+                assert.ok(_.isNumber(model.number_2));
+            });
+        }).then(done, done);
+    });
 });
