@@ -319,4 +319,20 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should populate field with null if specified as an attribute", function (done) {
+        var Model = sequelize.define("Model", {
+            number: Sequelize.INTEGER
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                attributes: {
+                    number: null
+                }
+            }).then(function (model) {
+                assert.ok(_.isNull(model.number));
+            });
+        }).then(done, done);
+    });
 });
