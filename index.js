@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require("lodash"),
+    Sequelize = require("sequelize"),
     when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
@@ -59,8 +60,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         if (_.isEmpty(associations)) {
             return instance;
         } else {
-            return when.all(_.map(associations, function (value) {
-                var target = value.target,
+            return when.all(_.map(associations, function (association) {
+                var target = association.target,
                     targetAttributes = options[target.name] && options[target.name].attributes || {},
                     targetInstancePromise;
 
@@ -75,12 +76,16 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     // existing record from the database. In other words, the foreign key value is set.
                     // Otherwise, create the instance.
                     targetInstancePromise = target.findOrCreate({
-                        id: options.attributes[value.identifier] || null
+                        id: options.attributes[association.identifier] || null
                     }, targetAttributes);
                 }
 
                 return targetInstancePromise.then(function (targetInstance) {
-                    return instance["set" + target.name](targetInstance).then(function () {
+                    // setterName code copied straight from Sequelize
+                    // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
+                    var setterName = Sequelize.Utils._.camelize('set_' + (association.options.as || Sequelize.Utils.singularize(target.tableName, association.options.language)));
+
+                    return instance[setterName](targetInstance).then(function () {
                         return targetInstance;
                     });
                 });

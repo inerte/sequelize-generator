@@ -443,4 +443,23 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should set parent model when association has \"as\" option", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {
+            name: Sequelize.STRING(42)
+        }),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent, {
+            foreignKey: "ModelParentId",
+            as: "someName"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(_.isString(child.name));
+                assert.ok(child.name.length > 0);
+            });
+        }).then(done, done);
+    });
 });
