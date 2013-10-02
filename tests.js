@@ -417,4 +417,30 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should populate STRING data type fields with random string", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {
+            name: Sequelize.STRING
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(_.isString(child.name));
+                assert.ok(child.name.length > 0);
+            });
+        }).then(done, done);
+    });
+
+    it("should populate STRING(n) data type fields with random string", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {
+            name: Sequelize.STRING(42)
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(_.isString(child.name));
+                assert.ok(child.name.length > 0);
+            });
+        }).then(done, done);
+    });
 });

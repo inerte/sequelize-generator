@@ -26,6 +26,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                         attributes[key] = _.sample(value.values);
                     } else if (typeString === "INTEGER") {
                         attributes[key] = _.parseInt(_.uniqueId(), 10);
+                    } else if (typeString.indexOf("VARCHAR(") === 0) { // starts with VARCHAR(
+                        attributes[key] = _.uniqueId();
                     }
                 }
             }
