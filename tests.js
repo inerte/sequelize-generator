@@ -15,8 +15,10 @@ describe("Sequelize generator", function () {
     "use strict";
 
     var sync = function () {
-        return sequelize.sync({
-            force: true
+        return sequelize.getQueryInterface().dropAllTables().then(function () {
+            return sequelize.sync({
+                force: true
+            });
         });
     };
 
