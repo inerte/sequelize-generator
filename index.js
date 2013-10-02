@@ -1,7 +1,6 @@
 "use strict";
 
 var _ = require("lodash"),
-    Sequelize = require("sequelize"),
     when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
@@ -20,8 +19,14 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             if (!_.has(value, "autoIncrement") && value.autoIncrement !== true) {
                 if (_.has(value, "references")) {
                     attributes[key] = null;
-                } else if (value === Sequelize.INTEGER || value.type === Sequelize.INTEGER) {
-                    attributes[key] = _.parseInt(_.uniqueId(), 10);
+                } else if (value.type) {
+                    var typeString = value.type.toString();
+
+                    if (typeString === "ENUM") {
+                        attributes[key] = _.sample(value.values);
+                    } else if (typeString === "INTEGER") {
+                        attributes[key] = _.parseInt(_.uniqueId(), 10);
+                    }
                 }
             }
         }).value();

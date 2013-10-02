@@ -401,4 +401,20 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should populate ENUM data type fields with any value from its possible values", function (done) {
+        var possibleValues = ["Julio", "José"],
+            ModelChild = sequelize.define("ModelChild", {
+                name: {
+                    type: Sequelize.ENUM,
+                    values: possibleValues
+                }
+            });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(_.contains(possibleValues, child.name));
+            });
+        }).then(done, done);
+    });
 });
