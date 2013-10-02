@@ -17,8 +17,12 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         .omit(_.keys(customValues))
         // Loop the remaining rawAttributes to set values according to its Sequelize data type
         .forEach(function (value, key) {
-            if (value.autoIncrement !== true && (value === Sequelize.INTEGER || value.type === Sequelize.INTEGER)) {
-                attributes[key] = _.parseInt(_.uniqueId(), 10);
+            if (!_.has(value, "autoIncrement") && value.autoIncrement !== true) {
+                if (_.has(value, "references")) {
+                    attributes[key] = null;
+                } else if (value === Sequelize.INTEGER || value.type === Sequelize.INTEGER) {
+                    attributes[key] = _.parseInt(_.uniqueId(), 10);
+                }
             }
         }).value();
 

@@ -381,4 +381,24 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+    it("should create record with NULL on fields that reference parents when foreignKeyConstraint is true", function (done) {
+        // Only the creation gets NULL. SequelizeG later calls instance.setModelParent(parentInstance) which will
+        // replace NULL by parentInstance primary key
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent, {
+            foreignKeyConstraint: true
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                return child.getModelParent().then(function (parent) {
+                    assert.ok(child.ModelParentId === parent.id);
+                    assert.ok(parent.daoFactoryName === ModelParent.name);
+                });
+            });
+        }).then(done, done);
+    });
 });
