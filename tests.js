@@ -40,9 +40,9 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (child) {
-                return child.getModelParent().then(function (parent) {
-                    assert.ok(parent.daoFactoryName === ModelParent.name);
-                });
+                return child.getModelParent();
+            }).then(function (parent) {
+                assert.ok(parent.daoFactoryName === ModelParent.name);
             });
         }).then(done, done);
     });
