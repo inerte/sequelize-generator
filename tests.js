@@ -404,7 +404,7 @@ describe("Sequelize generator", function () {
 
     it("should populate ENUM data type fields with any value from its possible values", function (done) {
         var possibleValues = ["Julio", "José"],
-            ModelChild = sequelize.define("ModelChild", {
+            Model = sequelize.define("Model", {
                 name: {
                     type: Sequelize.ENUM,
                     values: possibleValues
@@ -412,42 +412,40 @@ describe("Sequelize generator", function () {
             });
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (child) {
-                assert.ok(_.contains(possibleValues, child.name));
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.contains(possibleValues, instance.name));
             });
         }).then(done, done);
     });
 
     it("should populate STRING data type fields with random string", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {
+        var Model = sequelize.define("Model", {
             name: Sequelize.STRING
         });
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (child) {
-                assert.ok(_.isString(child.name));
-                assert.ok(child.name.length > 0);
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isString(instance.name));
+                assert.ok(instance.name.length > 0);
             });
         }).then(done, done);
     });
 
     it("should populate STRING(n) data type fields with random string", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {
+        var Model = sequelize.define("Model", {
             name: Sequelize.STRING(42)
         });
 
         sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (child) {
-                assert.ok(_.isString(child.name));
-                assert.ok(child.name.length > 0);
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isString(instance.name));
+                assert.ok(instance.name.length > 0);
             });
         }).then(done, done);
     });
 
     it("should set parent model when association has \"as\" option", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {
-            name: Sequelize.STRING(42)
-        }),
+        var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {});
 
         ModelChild.belongsTo(ModelParent, {
