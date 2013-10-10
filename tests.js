@@ -466,8 +466,8 @@ describe("Sequelize generator", function () {
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return child.getSomeName();
-            }).then(function (modelParent) {
-                assert.ok(modelParent.daoFactoryName === ModelParent.name);
+            }).then(function (parent) {
+                assert.ok(parent.daoFactoryName === ModelParent.name);
             });
         }).then(done, done);
     });
