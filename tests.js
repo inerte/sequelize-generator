@@ -471,4 +471,31 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
+
+
+    it("should set parent and grandparent model when associations have \"as\" option", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+        ModelChild.belongsTo(ModelParent, {
+            foreignKey: "ModelParentId",
+            as: "someName"
+        });
+
+        ModelParent.belongsTo(ModelGrandParent, {
+            foreignKey: "ModelGrandParentId",
+            as: "someOtherName"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                return child.getSomeName();
+            }).then(function (parent) {
+                return parent.getSomeOtherName();
+            }).then(function (grandParent) {
+                assert.ok(grandParent.daoFactoryName === ModelGrandParent.name);
+            }).then(done, done);
+        });
+    });
 });
