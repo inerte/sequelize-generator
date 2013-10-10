@@ -9,6 +9,26 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         attributes: {}
     };
 
+    function valueBasedOnAttribute(attribute) {
+        var typeString;
+
+        if (attribute.type) {
+            typeString = attribute.type.toString();
+        } else {
+            typeString = attribute;
+        }
+
+        if (typeString === "ENUM") {
+            return _.sample(attribute.values);
+        } else if (_.contains(["INTEGER", "SMALLINT UNSIGNED"], typeString)) {
+            return _.parseInt(_.uniqueId(), 10);
+        } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0) { // starts with VARCHAR( or CHAR(
+            return _.uniqueId();
+        }
+
+        return null;
+    }
+
     function setDefaultAttributesValue(rawAttributes, customValues) {
         var attributes = customValues || {};
 
@@ -20,15 +40,10 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             if (!_.has(value, "autoIncrement") && value.autoIncrement !== true) {
                 if (_.has(value, "references")) {
                     attributes[key] = null;
-                } else if (value.type) {
-                    var typeString = value.type.toString();
-
-                    if (typeString === "ENUM") {
-                        attributes[key] = _.sample(value.values);
-                    } else if (typeString === "INTEGER") {
-                        attributes[key] = _.parseInt(_.uniqueId(), 10);
-                    } else if (typeString.indexOf("VARCHAR(") === 0) { // starts with VARCHAR(
-                        attributes[key] = _.uniqueId();
+                } else {
+                    var valueToPopulate = valueBasedOnAttribute(value);
+                    if (!_.isNull(valueToPopulate)) {
+                        attributes[key] = valueToPopulate;
                     }
                 }
             }

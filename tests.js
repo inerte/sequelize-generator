@@ -454,6 +454,56 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should populate CHAR data type fields with random string", function (done) {
+        var Model = sequelize.define("Model", {
+            name: "CHAR"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isString(instance.name));
+                assert.ok(instance.name.length > 0);
+            });
+        }).then(done, done);
+    });
+
+    it("should populate CHAR(n) data type fields with random string", function (done) {
+        var Model = sequelize.define("Model", {
+            name: "CHAR(32)"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isString(instance.name));
+                assert.ok(instance.name.length > 0);
+            });
+        }).then(done, done);
+    });
+
+    it("should populate SMALLINT UNSIGNED data type fields with random number", function (done) {
+        var Model = sequelize.define("Model", {
+            number: "SMALLINT UNSIGNED"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isNumber(instance.number));
+            });
+        }).then(done, done);
+    });
+
+    it("should populate SMALLINT UNSIGNED data type fields with random number", function (done) {
+        var Model = sequelize.define("Model", {
+            number: "SMALLINT UNSIGNED"
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model).then(function (instance) {
+                assert.ok(_.isNumber(instance.number));
+            });
+        }).then(done, done);
+    });
+
     it("should set parent model when association has \"as\" option", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {});
