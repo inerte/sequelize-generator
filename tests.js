@@ -14,6 +14,16 @@ var sequelize = new Sequelize("myapp_test",
 describe("Sequelize generator", function () {
     "use strict";
 
+    afterEach(function () {
+        // Undo the model definition or it hangs on the sequelize object, infecting
+        // subsequent tests
+        var daoNames = _.pluck(sequelize.daoFactoryManager.daos, "name");
+
+        daoNames.forEach(function (daoName) {
+            sequelize.daoFactoryManager.removeDAO(sequelize.daoFactoryManager.getDAO(daoName));
+        });
+    });
+
     var sync = function () {
         return sequelize.getQueryInterface().dropAllTables().then(function () {
             return sequelize.sync({
