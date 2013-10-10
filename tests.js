@@ -472,7 +472,6 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
-
     it("should set parent and grandparent model when associations have \"as\" option", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {}),
@@ -495,6 +494,28 @@ describe("Sequelize generator", function () {
                 return parent.getSomeOtherName();
             }).then(function (grandParent) {
                 assert.ok(grandParent.daoFactoryName === ModelGrandParent.name);
+            }).then(done, done);
+        });
+    });
+
+    it("should only create parents, not children", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        ModelParent.belongsTo(ModelGrandParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelParent).then(function (parent) {
+                return ModelGrandParent.count();
+            }).then(function (grandParentCount) {
+                assert.equal(grandParentCount, 1);
+            }).then(function () {
+                return ModelChild.count();
+            }).then(function (childrenCount) {
+                assert.equal(childrenCount, 0);
             }).then(done, done);
         });
     });
