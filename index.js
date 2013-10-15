@@ -70,6 +70,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             options.rootInstance = instance;
         }
 
+        instance.generator = {};
+
         var associations = _.where(instance.daoFactory.associations, {
             associationType: "BelongsTo"
         });
@@ -115,6 +117,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                             var setterMethod = instance[setterName + "s"];
                         }
                     }
+
+                    instance.generator[target.name] = targetInstance;
 
                     return setterMethod.call(instance, targetInstance).then(function () {
                         return targetInstance;

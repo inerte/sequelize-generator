@@ -614,4 +614,24 @@ describe("Sequelize generator", function () {
         }).then(assert.ok).then(done, done); // assert.ok gets the true returned above
     });
 
+    it("should add a generator attribute with parent instances", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelMother = sequelize.define("ModelMother", {});
+
+        ModelChild.belongsTo(ModelParent);
+        ModelChild.belongsTo(ModelMother);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(_.has(child, "generator"));
+
+                assert.equal(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                assert.equal(child.generator.ModelMother.daoFactoryName, ModelMother.name);
+
+                return true;
+            });
+        }).then(assert.ok).then(done, done); // assert.ok gets the true returned above
+    });
+
 });
