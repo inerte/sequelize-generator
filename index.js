@@ -100,8 +100,10 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 }
 
                 return targetInstancePromise.then(function (targetInstance) {
+                    var setterMethod;
+
                     if (association.accessors && association.accessors.set) {
-                        var setterMethod = instance[association.accessors.set];
+                        setterMethod = instance[association.accessors.set];
 
                         if (association.associationType === "HasMany") {
                             targetInstance = [targetInstance];
@@ -112,9 +114,9 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                         var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(target.tableName, association.options.language)));
 
                         if (instance[setterName]) {
-                            var setterMethod = instance[setterName];
+                            setterMethod = instance[setterName];
                         } else if (instance[setterName + "s"]) {
-                            var setterMethod = instance[setterName + "s"];
+                            setterMethod = instance[setterName + "s"];
                         }
                     }
 

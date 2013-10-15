@@ -558,7 +558,7 @@ describe("Sequelize generator", function () {
         ModelParent.belongsTo(ModelGrandParent);
 
         sync().then(function () {
-            return new SequelizeG(ModelParent).then(function (parent) {
+            return new SequelizeG(ModelParent).then(function () {
                 return ModelGrandParent.count();
             }).then(function (grandParentCount) {
                 assert.equal(grandParentCount, 1);
