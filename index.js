@@ -70,7 +70,9 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             options.rootInstance = instance;
         }
 
-        var associations = instance.daoFactory.associations;
+        var associations = _.where(instance.daoFactory.associations, {
+            associationType: "BelongsTo"
+        });
 
         if (_.isEmpty(associations)) {
             return instance;
@@ -120,7 +122,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 });
             })).then(function (targetInstances) {
                 return when.all(targetInstances.map(function (targetInstance) {
-                    if (targetInstance.daoFactory && _(targetInstance.daoFactory.associations).pluck("associationType").first() === "BelongsTo") {
+                    if (!_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;
