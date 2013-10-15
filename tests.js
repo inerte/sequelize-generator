@@ -654,4 +654,36 @@ describe("Sequelize generator", function () {
         }).then(assert.ok).then(done, done); // assert.ok gets the true returned above
     });
 
+    it("should populate generator attribute for both parents, and 4 grandparents (paternal and maternal)", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelFather = sequelize.define("ModelFather", {}),
+            ModelMother = sequelize.define("ModelMother", {}),
+            ModelPaternalGrandFather = sequelize.define("ModelPaternalGrandFather", {}),
+            ModelPaternalGrandMother = sequelize.define("ModelPaternalGrandMother", {}),
+            ModelMaternalGrandFather = sequelize.define("ModelMaternalGrandFather", {}),
+            ModelMaternalGrandMother = sequelize.define("ModelMaternalGrandMother", {});
+
+        ModelChild.belongsTo(ModelFather);
+        ModelChild.belongsTo(ModelMother);
+
+        ModelFather.belongsTo(ModelPaternalGrandFather);
+        ModelFather.belongsTo(ModelPaternalGrandMother);
+
+        ModelMother.belongsTo(ModelMaternalGrandFather);
+        ModelMother.belongsTo(ModelMaternalGrandMother);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.ok(child.generator.ModelFather.daoFactoryName === ModelFather.name);
+                assert.ok(child.generator.ModelMother.daoFactoryName === ModelMother.name);
+
+                assert.ok(child.generator.ModelFather.generator.ModelPaternalGrandFather.daoFactoryName === ModelPaternalGrandFather.name);
+                assert.ok(child.generator.ModelFather.generator.ModelPaternalGrandMother.daoFactoryName === ModelPaternalGrandMother.name);
+
+                assert.ok(child.generator.ModelMother.generator.ModelMaternalGrandFather.daoFactoryName === ModelMaternalGrandFather.name);
+                assert.ok(child.generator.ModelMother.generator.ModelMaternalGrandMother.daoFactoryName === ModelMaternalGrandMother.name);
+            });
+        }).then(done, done);
+    });
+
 });
