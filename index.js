@@ -96,17 +96,31 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 }
 
                 return targetInstancePromise.then(function (targetInstance) {
-                    // setterName code copied straight from Sequelize
-                    // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
-                    var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(target.tableName, association.options.language)));
+                    if (association.accessors && association.accessors.set) {
+                        var setterMethod = instance[association.accessors.set];
 
-                    return instance[setterName](targetInstance).then(function () {
+                        if (association.associationType === "HasMany") {
+                            targetInstance = [targetInstance];
+                        }
+                    } else {
+                        // setterName code copied straight from Sequelize
+                        // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
+                        var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(target.tableName, association.options.language)));
+
+                        if (instance[setterName]) {
+                            var setterMethod = instance[setterName];
+                        } else if (instance[setterName + "s"]) {
+                            var setterMethod = instance[setterName + "s"];
+                        }
+                    }
+
+                    return setterMethod.call(instance, targetInstance).then(function () {
                         return targetInstance;
                     });
                 });
             })).then(function (targetInstances) {
                 return when.all(targetInstances.map(function (targetInstance) {
-                    if (!_.isEmpty(targetInstance.daoFactory.associations)) {
+                    if (targetInstance.daoFactory && _(targetInstance.daoFactory.associations).pluck("associationType").first() === "BelongsTo") {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;

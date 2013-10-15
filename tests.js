@@ -569,4 +569,49 @@ describe("Sequelize generator", function () {
             }).then(done, done);
         });
     });
+
+    it("should create parent when association is also made using HasMany", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelParent.hasMany(ModelChild);
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                return ModelParent.find(child.ModelParentId).then(function (modelParent) {
+                    return child.getModelParent().then(function (parent) {
+                        assert.equal(parent.daoFactoryName, ModelParent.name);
+                        assert.equal(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.equal(parent.id, modelParent.id);
+
+                        return true;
+                    });
+                });
+            });
+        }).then(assert.ok).then(done, done); // assert.ok gets the true returned above, to make sure all assert.equals were run
+    });
+
+    it("should create parent when association is also made using HasOne", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelParent.hasOne(ModelChild);
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                return ModelParent.find(child.ModelParentId).then(function (modelParent) {
+                    return child.getModelParent().then(function (parent) {
+                        assert.equal(parent.daoFactoryName, ModelParent.name);
+                        assert.equal(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.equal(parent.id, modelParent.id);
+
+                        return true;
+                    });
+                });
+            });
+        }).then(assert.ok).then(done, done); // assert.ok gets the true returned above
+    });
+
 });
