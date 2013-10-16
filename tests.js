@@ -81,7 +81,7 @@ describe("Sequelize generator", function () {
                 }));
             });
         }).then(function (is) {
-            assert.equal(parentModelsLength, is.length);
+            assert.strictEqual(parentModelsLength, is.length);
             done();
         }, done);
     });
@@ -134,7 +134,7 @@ describe("Sequelize generator", function () {
                 }, model0);
             });
         }).then(function (total) {
-            assert.equal(additionalModelsNumber + 1, total);
+            assert.strictEqual(additionalModelsNumber + 1, total);
             done();
         }, done);
     });
@@ -201,7 +201,7 @@ describe("Sequelize generator", function () {
                     name: "Julio Nobrega Netto"
                 }
             }).then(function (child) {
-                assert.equal(child.name, "Julio Nobrega Netto");
+                assert.strictEqual(child.name, "Julio Nobrega Netto");
             });
         }).then(done, done);
     });
@@ -224,7 +224,7 @@ describe("Sequelize generator", function () {
             }).then(function (child) {
                 return child.getModelParent();
             }).then(function (parent) {
-                assert.equal(parent.name, "José Nobrega Netto");
+                assert.strictEqual(parent.name, "José Nobrega Netto");
             });
         }).then(done, done);
     });
@@ -251,7 +251,7 @@ describe("Sequelize generator", function () {
             }).then(function (parent) {
                 return parent.getModelGrandParent();
             }).then(function (grandParent) {
-                assert.equal(grandParent.name, "Julio Nobrega");
+                assert.strictEqual(grandParent.name, "Julio Nobrega");
             });
         }).then(done, done);
     });
@@ -286,8 +286,8 @@ describe("Sequelize generator", function () {
     });
 
     it("should not populate INTEGER data type field on child and parents if set as attributes", function (done) {
-        var childNumber = _.uniqueId(),
-            parentNumber = _.uniqueId(),
+        var childNumber = _.parseInt(_.uniqueId(), 10),
+            parentNumber = _.parseInt(_.uniqueId(), 10),
             ModelChild = sequelize.define("ModelChild", {
                 number: Sequelize.INTEGER
             }),
@@ -308,10 +308,10 @@ describe("Sequelize generator", function () {
                     }
                 }
             }).then(function (child) {
-                assert.equal(child.number, childNumber);
+                assert.strictEqual(child.number, childNumber);
                 return child.getModelParent();
             }).then(function (parent) {
-                assert.equal(parent.number, parentNumber);
+                assert.strictEqual(parent.number, parentNumber);
             });
         }).then(done, done);
     });
@@ -561,11 +561,11 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelParent).then(function () {
                 return ModelGrandParent.count();
             }).then(function (grandParentCount) {
-                assert.equal(grandParentCount, 1);
+                assert.strictEqual(grandParentCount, 1);
             }).then(function () {
                 return ModelChild.count();
             }).then(function (childrenCount) {
-                assert.equal(childrenCount, 0);
+                assert.strictEqual(childrenCount, 0);
             }).then(done, done);
         });
     });
@@ -581,15 +581,15 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return ModelParent.find(child.ModelParentId).then(function (modelParent) {
                     return child.getModelParent().then(function (parent) {
-                        assert.equal(parent.daoFactoryName, ModelParent.name);
-                        assert.equal(parent.daoFactoryName, modelParent.daoFactoryName);
-                        assert.equal(parent.id, modelParent.id);
+                        assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                        assert.strictEqual(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.strictEqual(parent.id, modelParent.id);
 
                         return true;
                     });
                 });
             });
-        }).then(assert.ok).then(done, done); // assert.ok gets the true returned above, to make sure all assert.equals were run
+        }).then(assert.ok).then(done, done); // assert.ok gets the true returned above, to make sure all assert.strictEquals were run
     });
 
     it("should create parent when association is also made using HasOne", function (done) {
@@ -603,9 +603,9 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return ModelParent.find(child.ModelParentId).then(function (modelParent) {
                     return child.getModelParent().then(function (parent) {
-                        assert.equal(parent.daoFactoryName, ModelParent.name);
-                        assert.equal(parent.daoFactoryName, modelParent.daoFactoryName);
-                        assert.equal(parent.id, modelParent.id);
+                        assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                        assert.strictEqual(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.strictEqual(parent.id, modelParent.id);
 
                         return true;
                     });
@@ -626,8 +626,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 assert.ok(_.has(child, "generator"));
 
-                assert.equal(child.generator.ModelParent.daoFactoryName, ModelParent.name);
-                assert.equal(child.generator.ModelMother.daoFactoryName, ModelMother.name);
+                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(child.generator.ModelMother.daoFactoryName, ModelMother.name);
 
                 return true;
             });
@@ -646,8 +646,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 assert.ok(_.has(child, "generator"));
 
-                assert.equal(child.generator.ModelParent.daoFactoryName, ModelParent.name);
-                assert.equal(child.generator.ModelParent.generator.ModelGrandParent.daoFactoryName, ModelGrandParent.name);
+                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent.daoFactoryName, ModelGrandParent.name);
 
                 return true;
             });
@@ -698,7 +698,7 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (child) {
-                assert.equal(child.url.indexOf("http://"), 0);
+                assert.strictEqual(child.url.indexOf("http://"), 0);
             });
         }).then(done, done);
     });
