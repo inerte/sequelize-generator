@@ -26,7 +26,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             // starts with VARCHAR( or CHAR(, or is TEXT
         } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0 || typeString === "TEXT") {
             if (attribute.validate && attribute.validate.isUrl) {
-                return "http://example.com/" + _.uniqueId()
+                return "http://example.com/" + _.uniqueId();
             } else {
                 return _.uniqueId();
             }
@@ -79,10 +79,12 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     return instancesIfNeeded(sequelizeModelOrInstance).then(function (instances) {
+        var instance;
+
         if (options.number > 1) {
             return instances;
         } else {
-            var instance = instances[0];
+            instance = instances[0];
         }
 
         // Since G is recursive, options.rootInstance keeps track of what should be ultimately returned
