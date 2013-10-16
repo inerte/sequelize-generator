@@ -29,25 +29,25 @@ You can, from ModelChild, create every parent level above:
 ```js
 new SequelizeG(ModelChild).then(function (child) {
     return child.getModelFather().then(function (father) {
-        assert.ok(father.daoFactoryName === ModelFather.name);
+        assert.strictEqual(father.daoFactoryName, ModelFather.name);
         return father.getModelPaternalGrandFather().then(function (paternalGrandFather) {
-            assert.ok(paternalGrandFather.daoFactoryName === ModelPaternalGrandFather.name);
+            assert.strictEqual(paternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
 
             return father.getModelPaternalGrandMother();
         }).then(function (paternalGrandMother) {
-            assert.ok(paternalGrandMother.daoFactoryName === ModelPaternalGrandMother.name);
+            assert.strictEqual(paternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
 
             return child;
         });
     }).then(function (child) {
         return child.getModelMother().then(function (mother) {
-            assert.ok(mother.daoFactoryName === ModelMother.name);
+            assert.strictEqual(mother.daoFactoryName, ModelMother.name);
             return mother.getModelMaternalGrandFather().then(function (maternalGrandFather) {
-                assert.ok(maternalGrandFather.daoFactoryName === ModelMaternalGrandFather.name);
+                assert.strictEqual(maternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
 
                 return mother.getModelMaternalGrandMother();
             }).then(function (maternalGrandMother) {
-                assert.ok(maternalGrandMother.daoFactoryName === ModelMaternalGrandMother.name);
+                assert.strictEqual(maternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
 
                 return null;
             });
@@ -60,14 +60,14 @@ Phew! That's a lot of promises. This is ok for production code, but for tests, w
 
 ```js
 new SequelizeG(ModelChild).then(function (child) {
-    assert.ok(child.generator.ModelFather.daoFactoryName === ModelFather.name);
-    assert.ok(child.generator.ModelMother.daoFactoryName === ModelMother.name);
+    assert.strictEqual(child.generator.ModelFather.daoFactoryName, ModelFather.name);
+    assert.strictEqual(child.generator.ModelMother.daoFactoryName, ModelMother.name);
 
-    assert.ok(child.generator.ModelFather.generator.ModelPaternalGrandFather.daoFactoryName === ModelPaternalGrandFather.name);
-    assert.ok(child.generator.ModelFather.generator.ModelPaternalGrandMother.daoFactoryName === ModelPaternalGrandMother.name);
+    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
+    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
 
-    assert.ok(child.generator.ModelMother.generator.ModelMaternalGrandFather.daoFactoryName === ModelMaternalGrandFather.name);
-    assert.ok(child.generator.ModelMother.generator.ModelMaternalGrandMother.daoFactoryName === ModelMaternalGrandMother.name);
+    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
+    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
 });
 ```
 
