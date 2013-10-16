@@ -71,4 +71,22 @@ new SequelizeG(ModelChild).then(function (child) {
 });
 ```
 
+You can tell sequelize-generator to stop creating parents with {ModelName: null}. See test "should stop creating parents if option is set":
+
+```js
+var ModelChild = sequelize.define("ModelChild", {}),
+    ModelParent = sequelize.define("ModelParent", {}),
+    ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+    ModelChild.belongsTo(ModelParent);
+    ModelParent.belongsTo(ModelGrandParent);
+
+    new SequelizeG(ModelChild, {
+        ModelGrandParent: null
+    }).then(function (child) {
+        assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+        assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
+    });
+```
+
 If you want a random, already created, record to be selected as parent, pass {ModelParent: "any"} as an option. See test "should set a foreign key to a random, already created record, if option is set".

@@ -95,6 +95,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     targetInstancePromise = target.findAll().then(function (targetInstances) {
                         return _.sample(targetInstances);
                     });
+                } else if (options[target.name] === null) {
+                    return;
                 } else {
                     // If the target identifier was passed as an atribute of instance, try to get the
                     // existing record from the database. In other words, the foreign key value is set.
@@ -133,7 +135,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 });
             })).then(function (targetInstances) {
                 return when.all(targetInstances.map(function (targetInstance) {
-                    if (!_.isEmpty(targetInstance.daoFactory.associations)) {
+                    if (targetInstance && !_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;

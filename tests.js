@@ -703,4 +703,28 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should stop creating parents if option is set", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+        ModelParent.belongsTo(ModelGrandParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                ModelGrandParent: null
+            }).then(function (child) {
+                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
+
+                return child.getModelParent();
+            }).then(function (parent) {
+                return parent.getModelGrandParent();
+            }).then(function (grandParent) {
+                assert.strictEqual(grandParent, null);
+            });
+        }).then(done, done);
+    });
+
 });
