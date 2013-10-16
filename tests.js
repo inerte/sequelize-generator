@@ -686,4 +686,19 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should populate field with url if required by its validation", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {
+            url: {
+                type: Sequelize.TEXT,
+                isUrl: true
+            }
+        });
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild).then(function (child) {
+                assert.equal(child.url.indexOf("http://"), 0);
+            });
+        }).then(done, done);
+    });
+
 });

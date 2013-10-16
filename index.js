@@ -22,8 +22,13 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             return _.sample(attribute.values);
         } else if (_.contains(["INTEGER", "SMALLINT UNSIGNED"], typeString)) {
             return _.parseInt(_.uniqueId(), 10);
-        } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0) { // starts with VARCHAR( or CHAR(
-            return _.uniqueId();
+            // starts with VARCHAR( or CHAR(, or is TEXT
+        } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0 || typeString === "TEXT") {
+            if (attribute.isUrl) {
+                return "http://example.com/" + _.uniqueId()
+            } else {
+                return _.uniqueId();
+            }
         }
 
         return null;
