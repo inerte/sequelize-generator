@@ -57,7 +57,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         return attributes;
     }
 
-    function instanceIfNeeded() {
+    function instanceIfNeeded(sequelizeModelOrInstance) {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
             options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes);
