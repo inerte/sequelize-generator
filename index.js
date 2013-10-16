@@ -24,7 +24,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             return _.parseInt(_.uniqueId(), 10);
             // starts with VARCHAR( or CHAR(, or is TEXT
         } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0 || typeString === "TEXT") {
-            if (attribute.isUrl) {
+            if (attribute.validate && attribute.validate.isUrl) {
                 return "http://example.com/" + _.uniqueId()
             } else {
                 return _.uniqueId();

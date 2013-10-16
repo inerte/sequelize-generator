@@ -690,7 +690,9 @@ describe("Sequelize generator", function () {
         var ModelChild = sequelize.define("ModelChild", {
             url: {
                 type: Sequelize.TEXT,
-                isUrl: true
+                validate: {
+                    isUrl: true
+                }
             }
         });
 
