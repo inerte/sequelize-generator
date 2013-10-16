@@ -362,7 +362,7 @@ describe("Sequelize generator", function () {
                     ModelParentId: parent.id
                 }
             }).then(function (child) {
-                assert.equal(parent.id, child.ModelParentId);
+                assert.strictEqual(parent.id, child.ModelParentId);
             });
         }).then(done, done);
     });
