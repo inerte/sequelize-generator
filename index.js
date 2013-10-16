@@ -5,9 +5,10 @@ var _ = require("lodash"),
     when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
-    options = options || {
-        attributes: {}
-    };
+    options = _.merge({
+        attributes: {},
+        number: 1
+    }, options);
 
     function valueBasedOnAttribute(attribute) {
         var typeString;
@@ -57,19 +58,33 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         return attributes;
     }
 
-    function instanceIfNeeded(sequelizeModelOrInstance) {
+    function instancesIfNeeded(sequelizeModelOrInstance) {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
             options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes);
 
-            return sequelizeModelOrInstance.create(options.attributes);
+            var bulkCreateArgument = [];
+
+            for (var i = 0; i < options.number; i++) {
+                bulkCreateArgument.push(options.attributes);
+            }
+
+            return sequelizeModelOrInstance.bulkCreate(bulkCreateArgument).then(function () {
+                return sequelizeModelOrInstance.findAll();
+            });
         } else {
             // It is already an instance, not a model, so wrap it as a promise
-            return when(sequelizeModelOrInstance);
+            return when([sequelizeModelOrInstance]);
         }
     }
 
-    return instanceIfNeeded(sequelizeModelOrInstance).then(function (instance) {
+    return instancesIfNeeded(sequelizeModelOrInstance).then(function (instances) {
+        if (options.number > 1) {
+            return instances;
+        } else {
+            var instance = instances[0];
+        }
+
         // Since G is recursive, options.rootInstance keeps track of what should be ultimately returned
         if (!options.rootInstance) {
             options.rootInstance = instance;

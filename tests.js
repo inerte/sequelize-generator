@@ -727,4 +727,24 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should create as many instances as set in options", function (done) {
+        var Model = sequelize.define("Model", {});
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                number: 2
+            }).then(function (children) {
+                var childA = children[0],
+                    childB = children[1];
+
+                assert.strictEqual(2, children.length);
+
+                assert.strictEqual(childA.daoFactoryName, Model.name);
+                assert.strictEqual(childB.daoFactoryName, Model.name);
+
+                assert.notStrictEqual(childA.id, childB.id);
+            });
+        }).then(done, done);
+    });
+
 });

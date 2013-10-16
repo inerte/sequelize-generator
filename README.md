@@ -81,12 +81,32 @@ var ModelChild = sequelize.define("ModelChild", {}),
     ModelChild.belongsTo(ModelParent);
     ModelParent.belongsTo(ModelGrandParent);
 
-    new SequelizeG(ModelChild, {
-        ModelGrandParent: null
-    }).then(function (child) {
-        assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
-        assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
-    });
+new SequelizeG(ModelChild, {
+    ModelGrandParent: null
+}).then(function (child) {
+    assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+    assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
+});
+```
+
+You can tell sequelize-generator to generate several instances (an array will be returned):
+
+```js
+var Model = sequelize.define("Model", {});
+
+new SequelizeG(Model, {
+    number: 2
+}).then(function (children) {
+    var childA = children[0],
+        childB = children[1];
+
+    assert.strictEqual(2, children.length);
+
+    assert.strictEqual(childA.daoFactoryName, Model.name);
+    assert.strictEqual(childB.daoFactoryName, Model.name);
+
+    assert.notStrictEqual(childA.id, childB.id);
+});
 ```
 
 If you want a random, already created, record to be selected as parent, pass {ModelParent: "any"} as an option. See test "should set a foreign key to a random, already created record, if option is set".
