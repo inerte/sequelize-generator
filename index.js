@@ -71,8 +71,13 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 bulkCreateArgument.push(options.attributes);
             }
 
+            // Sadly .bulkCreate does not return the newly created instances. We need to .findAll, but since calling G() multiple times
+            // could potentially run .findAll and return previously created records, we need to .slice with just the last options.number
+            // elements
             return sequelizeModelOrInstance.bulkCreate(bulkCreateArgument).then(function () {
                 return sequelizeModelOrInstance.findAll();
+            }).then(function (instances) {
+                return instances.slice(-options.number);
             });
         } else {
             // It is already an instance, not a model, so wrap it as a promise
