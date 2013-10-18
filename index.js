@@ -82,6 +82,12 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         var instance;
 
         if (options.number > 1) {
+            options.number = options.number - 1;
+
+            return when.map(instances, function (instance) {
+                return G(instance, options);
+            });
+
             return instances;
         } else {
             instance = instances[0];
