@@ -769,4 +769,30 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should create as many instances, with its parent, but not one of its grandparents, as set in options", function (done) {
+        // That means one parent for 2 children, but just one grandparent
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelPaternalGrandFather = sequelize.define("ModelPaternalGrandFather", {}),
+            ModelPaternalGrandMother = sequelize.define("ModelPaternalGrandMother", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        ModelParent.belongsTo(ModelPaternalGrandFather);
+        ModelParent.belongsTo(ModelPaternalGrandMother);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                number: 2,
+                ModelPaternalGrandFather: null
+            }).then(function (children) {
+                var childA = children[0],
+                    childB = children[1];
+
+                assert.strictEqual(childB.generator.ModelParent.generator.ModelPaternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+                assert.strictEqual(childA.generator.ModelParent.generator.ModelPaternalGrandFather, undefined);
+            });
+        }).then(done, done);
+    });
+
 });
