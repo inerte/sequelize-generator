@@ -107,7 +107,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         if (_.isEmpty(associations)) {
             return instance;
         } else {
-            return when.all(_.map(associations, function (association) {
+            return when.map(associations, function (association) {
                 var target = association.target,
                     targetAttributes = options[target.name] && options[target.name].attributes || {},
                     targetInstancePromise;
@@ -156,7 +156,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                         return targetInstance;
                     });
                 });
-            })).then(function (targetInstances) {
+            }).then(function (targetInstances) {
                 return when.all(targetInstances.map(function (targetInstance) {
                     if (targetInstance && !_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
