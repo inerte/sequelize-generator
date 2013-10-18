@@ -157,13 +157,13 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     });
                 });
             }).then(function (targetInstances) {
-                return when.all(targetInstances.map(function (targetInstance) {
+                return when.map(targetInstances, function (targetInstance) {
                     if (targetInstance && !_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;
                     }
-                }));
+                });
             }).then(function () {
                 return options.rootInstance;
             });
