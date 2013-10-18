@@ -59,12 +59,12 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     function instancesIfNeeded(sequelizeModelOrInstance) {
+        var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier");
+
+        options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
+
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
-            var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier");
-
-            options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
-
             var bulkCreateArgument = [];
 
             for (var i = 0; i < options.number; i++) {
@@ -112,7 +112,9 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     targetAttributes = options[target.name] && options[target.name].attributes || {},
                     targetInstancePromise;
 
-                targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes, [association.identifier]);
+                var associationIdentifiers = _.pluck(target.associations, "identifier");
+
+                targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes, associationIdentifiers);
 
                 if (options[target.name] && options[target.name] === "any") {
                     targetInstancePromise = target.findAll().then(function (targetInstances) {

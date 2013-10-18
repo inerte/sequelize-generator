@@ -795,4 +795,81 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should create as many instances, and set an existing parent, as set in options", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return ModelParent.create();
+        }).then(function (parent) {
+            return new SequelizeG(ModelChild, {
+                number: 2,
+                attributes: {
+                    ModelParentId: parent.id
+                }
+            }).then(function (children) {
+                return ModelParent.count().then(function (parentCount) {
+                    assert.strictEqual(parentCount, 1); // Just to make sure number: 2 did not create more than one parent
+
+                    return children;
+                });
+            }).then(function (children) {
+                var childA = children[0],
+                    childB = children[1];
+
+                assert.strictEqual(childA.generator.ModelParent.id, parent.id);
+                assert.strictEqual(childB.generator.ModelParent.id, parent.id);
+
+                assert.notStrictEqual(childA.id, childB.id);
+            });
+        }).then(done, done);
+    });
+
+    it("should create as many instances, set an existing parent, and stop at grandparent, as set in options", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {}),
+            ModelGrandParent = sequelize.define("ModelGrandParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        ModelParent.belongsTo(ModelGrandParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelParent); // This should create ModelChild's GrandFather, per previous tests
+        }).then(function (parent) {
+            return ModelGrandParent.findAndCountAll().then(function (result) {
+                // Make sure only one GrandParent exists at the database
+                assert.strictEqual(result.count, 1);
+
+                var grandParent = result.rows[0];
+
+                return new SequelizeG(ModelChild, {
+                    number: 2,
+                    ModelGrandParent: null,
+                    attributes: {
+                        ModelParentId: parent.id
+                    }
+                }).then(function (children) {
+                    var childA = children[0],
+                        childB = children[1];
+
+                    // They share the same parent
+                    assert.strictEqual(childA.generator.ModelParent.id, parent.id);
+                    assert.strictEqual(childB.generator.ModelParent.id, parent.id);
+
+                    assert.notStrictEqual(childA.id, childB.id);
+
+                    return childA.generator.ModelParent.getModelGrandParent().then(function (childAGrandParent) {
+                        assert.strictEqual(childAGrandParent.id, grandParent.id); // Child's grandParent is its parent's parent
+
+                        return childB.generator.ModelParent.getModelGrandParent();
+                    }).then(function (childBGrandParent) {
+                        assert.strictEqual(childBGrandParent.id, grandParent.id); // Child's grandParent is its parent's parent
+                    });
+                });
+            });
+        }).then(done, done);
+    });
 });
