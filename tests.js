@@ -872,16 +872,4 @@ describe("Sequelize generator", function () {
             });
         }).then(done, done);
     });
-
-    it("should create new instances if generator is called multiple times", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {});
-
-        sync().then(function () {
-            return new SequelizeG(ModelChild);
-        }).then(function (childA) {
-            return new SequelizeG(ModelChild).then(function (childB) {
-                assert.notStrictEqual(childA.id, childB.id);
-            });
-        }).then(done, done);
-    });
 });
