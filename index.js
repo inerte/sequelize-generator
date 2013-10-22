@@ -59,13 +59,12 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     function instancesIfNeeded(sequelizeModelOrInstance) {
-        var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier");
-
-        options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
-
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
-            var bulkCreateArgument = [];
+            var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier"),
+                bulkCreateArgument = [];
+
+            options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
 
             for (var i = 0; i < options.number; i++) {
                 bulkCreateArgument.push(options.attributes);
