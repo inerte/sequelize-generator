@@ -35,7 +35,7 @@
         "url": "https://github.com/inerte/sequelize-generator.git"
     },
     "scripts": {
-        "lint": "node_modules/.bin/jshint *.js",
-        "test": "./node_modules/.bin/mocha tests.js"
+        "lint": "node_modules/.bin/jshint **/*.js",
+        "test": "./node_modules/.bin/mocha"
     }
 }

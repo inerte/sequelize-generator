@@ -1,6 +1,6 @@
 var _ = require("lodash"),
     Sequelize = require("sequelize"),
-    SequelizeG = require("./index.js"),
+    SequelizeG = require("../index.js"),
     assert = require("assert"),
     when = require("when");
 
