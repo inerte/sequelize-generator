@@ -1,6 +1,6 @@
 {
     "name": "sequelize-generator",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "description": "Helper to create sequelize objects",
     "author": {
         "name": "Julio Nobrega Netto",

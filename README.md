@@ -127,4 +127,23 @@ new SequelizeG(Model, {
 });
 ```
 
+You can set an attribute value by passing a function:
+
+```js
+var Model = sequelize.define("Model", {
+        name: Sequelize.STRING
+    }),
+    name = "Julio";
+
+new SequelizeG(Model, {
+    attributes: {
+        name: function () {
+            return name;
+        }
+    }
+}).then(function (instance) {
+    assert.strictEqual(name, instance.name);
+});
+```
+
 If you want a random, already created, record to be selected as parent, pass {ModelParent: "any"} as an option. See test "should set a foreign key to a random, already created record, if option is set".

@@ -69,12 +69,14 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             for (var i = 0; i < options.number; i++) {
                 var attributes = {};
 
-                _.each(options.attributes, function (value, key) {
-                    if (_.isArray(value)) {
-                        value = value.shift();
+                _.forEach(options.attributes, function (value, key) {
+                    if (_.isArray(value)) { // If value is an array, we consume the first element
+                        attributes[key] = value[i];
+                    } else if (_.isFunction(value)) { // If value is a function, execute it
+                        attributes[key] = value();
+                    } else {
+                        attributes[key] = value;
                     }
-
-                    attributes[key] = value;
                 });
 
                 bulkCreateArgument.push(attributes);
@@ -98,10 +100,31 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         var instance;
 
         if (options.number > 1) {
+            var originalNumber = options.number;
+
             options.number = options.number - instances.length;
 
             return when.map(instances, function (instance) {
-                return new G(instance, options);
+                var optionsCopy = _.clone(options);
+
+                if (originalNumber > 0) {
+                    // This part should be refactored with bulkCreateArgument.push's from instancesIfNeeded()
+                    var attributes = {};
+
+                    _.forEach(options.attributes, function (value, key) {
+                        if (_.isArray(value)) { // If value is an array, we consume the first element
+                            attributes[key] = value.shift();
+                        } else if (_.isFunction(value)) { // If value is a function, execute it
+                            attributes[key] = value();
+                        } else {
+                            attributes[key] = value;
+                        }
+                    });
+
+                    optionsCopy.attributes = attributes;
+                }
+
+                return new G(instance, optionsCopy);
             });
         } else {
             instance = instances[0];

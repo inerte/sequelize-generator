@@ -356,6 +356,47 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should accept as an attribute an array of foreign keys that are consumed each time an instance is created", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelParent, {
+                number: 2
+            });
+        }).then(function (parents) {
+            return new SequelizeG(ModelChild, {
+                number: 2,
+                attributes: {
+                    ModelParentId: _.pluck(parents, "id")
+                }
+            }).then(function (children) {
+                assert.deepEqual(_.pluck(children, "ModelParentId"), _.pluck(parents, "id"));
+            });
+        }).then(done, done);
+    });
+
+    it("should accept as an attribute a function that returns the value to be set", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING
+        }),
+            name = "Julio";
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                attributes: {
+                    name: function () {
+                        return name;
+                    }
+                }
+            }).then(function (instance) {
+                assert.strictEqual(name, instance.name);
+            });
+        }).then(done, done);
+    });
+
     it("should set a foreign key to a random, already created record, if option is set", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {});
