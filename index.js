@@ -67,7 +67,17 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
 
             for (var i = 0; i < options.number; i++) {
-                bulkCreateArgument.push(options.attributes);
+                var attributes = {};
+
+                _.each(options.attributes, function (value, key) {
+                    if (_.isArray(value)) {
+                        value = value.shift();
+                    }
+
+                    attributes[key] = value;
+                });
+
+                bulkCreateArgument.push(attributes);
             }
 
             // Sadly .bulkCreate does not return the newly created instances. We need to .findAll, but since calling G() multiple times

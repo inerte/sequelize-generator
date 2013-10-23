@@ -338,6 +338,24 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should accept as an attribute an array that is consumed each time an instance is created", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING
+        }),
+            names = ["Julio", "Gustavo", "Felipe"];
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                number: 3,
+                attributes: {
+                    name: names
+                }
+            }).then(function (children) {
+                assert.deepEqual(_.pluck(children, "name"), names);
+            });
+        }).then(done, done);
+    });
+
     it("should set a foreign key to a random, already created record, if option is set", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {});
