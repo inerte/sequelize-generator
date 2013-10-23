@@ -607,43 +607,49 @@ describe("Sequelize generator", function () {
     });
 
     it("should create as many instances, without any parent, as set in options", function (done) {
-        var Model = sequelize.define("Model", {});
+        var Model = sequelize.define("Model", {}),
+            number = 7;
 
         sync().then(function () {
             return new SequelizeG(Model, {
-                number: 2
+                number: number
             }).then(function (children) {
-                var childA = children[0],
-                    childB = children[1];
+                // Children has number elements
+                assert.strictEqual(number, children.length);
 
-                assert.strictEqual(2, children.length);
+                // Each child is an instance of Model
+                children.forEach(function (child) {
+                    assert.strictEqual(child.daoFactoryName, Model.name);
+                });
 
-                assert.strictEqual(childA.daoFactoryName, Model.name);
-                assert.strictEqual(childB.daoFactoryName, Model.name);
-
-                assert.notStrictEqual(childA.id, childB.id);
+                // Children ids are 1..7
+                assert.deepEqual(_.pluck(children, "id"), _.range(1, number + 1));
             });
         }).then(done, done);
     });
 
     it("should create as many instances, with its parent, as set in options", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
-            ModelParent = sequelize.define("ModelParent", {});
+            ModelParent = sequelize.define("ModelParent", {}),
+            number = 7;
 
         ModelChild.belongsTo(ModelParent);
         ModelParent.hasMany(ModelChild);
 
         sync().then(function () {
             return new SequelizeG(ModelChild, {
-                number: 2
+                number: number
             }).then(function (children) {
-                var childA = children[0],
-                    childB = children[1];
+                // Children has number elements
+                assert.strictEqual(number, children.length);
 
-                assert.strictEqual(childA.generator.ModelParent.daoFactoryName, ModelParent.name);
-                assert.strictEqual(childB.generator.ModelParent.daoFactoryName, ModelParent.name);
+                // Each child is an instance of Model
+                children.forEach(function (child) {
+                    assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                });
 
-                assert.notStrictEqual(childA.id, childB.id);
+                // Children ids are 1..7
+                assert.deepEqual(_.pluck(children, "id"), _.range(1, number + 1));
             });
         }).then(done, done);
     });
