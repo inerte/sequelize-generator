@@ -356,6 +356,28 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should accept as attributes arrays that are consumed each time an instance is created", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING,
+            profession: Sequelize.STRING,
+        }),
+            names = ["Julio", "Gustavo", "Felipe"],
+            professions = ["Programmer", "Producer", "Chef"];
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                number: 3,
+                attributes: {
+                    name: names,
+                    profession: professions,
+                }
+            }).then(function (children) {
+                assert.deepEqual(_.pluck(children, "name"), names);
+                assert.deepEqual(_.pluck(children, "profession"), professions);
+            });
+        }).then(done, done);
+    });
+
     it("should accept as an attribute an array of foreign keys that are consumed each time an instance is created", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelParent = sequelize.define("ModelParent", {});
