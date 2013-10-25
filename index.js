@@ -36,7 +36,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     function setDefaultAttributesValue(rawAttributes, customValues, associationIdentifiers) {
-        var attributes = customValues || {};
+        var attributes = _.clone(customValues) || {};
 
         _(rawAttributes)
         // Removes from rawAttributes any attributes from customValues. We want user-passed values to take precedence
@@ -64,18 +64,14 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier"),
                 bulkCreateArgument = [];
 
-            options.attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
-
             for (var i = 0; i < options.number; i++) {
-                var attributes = {};
+                var attributes = setDefaultAttributesValue(sequelizeModelOrInstance.rawAttributes, options.attributes, associationIdentifiers);
 
                 _.forEach(options.attributes, function (value, key) {
                     if (_.isArray(value)) { // If value is an array, we consume the first element
                         attributes[key] = value[i];
                     } else if (_.isFunction(value)) { // If value is a function, execute it
                         attributes[key] = value();
-                    } else {
-                        attributes[key] = value;
                     }
                 });
 

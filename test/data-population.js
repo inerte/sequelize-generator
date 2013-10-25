@@ -139,4 +139,21 @@ describe("Sequelize generator data type fields pre-population", function () {
             });
         }).then(done, done);
     });
+
+    it("should populate fields with unique characters when number option is set", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING
+        });
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                number: 2,
+            }).then(function (instances) {
+                var instanceA = instances[0],
+                    instanceB = instances[1];
+
+                assert.notStrictEqual(instanceA.name, instanceB.name);
+            });
+        }).then(done, done);
+    });
 });
