@@ -155,7 +155,11 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     });
                 } else if (options[target.name] && options[target.name] === "shared") {
                     targetInstancePromise = target.findAll().then(function (targetInstances) {
-                        return _.first(targetInstances);
+                        if (targetInstances.length === 0) {
+                            return target.create(targetAttributes);
+                        } else {
+                            return _.first(targetInstances);
+                        }
                     });
                 } else if (options[target.name] === null) {
                     return;

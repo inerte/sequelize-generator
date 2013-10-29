@@ -458,9 +458,10 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild, {
-                ModelCommonAncestor: "shared"
+                ModelCommonAncestor: "shared",
             }).then(function (child) {
-                assert.strictEqual(child.generator.ModelFather.ModelCommonAncestorId, child.generator.ModelMother.ModelCommonAncestorId);
+                assert.notStrictEqual(child.generator.ModelFather.ModelCommonAncestorId, null);
+                assert.strictEqual(child.generator.ModelFather.ModelCommonAncestorId, child.generator.ModelFather.ModelCommonAncestorId);
             });
         }).then(done, done);
     });
