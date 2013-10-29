@@ -153,6 +153,10 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     targetInstancePromise = target.findAll().then(function (targetInstances) {
                         return _.sample(targetInstances);
                     });
+                } else if (options[target.name] && options[target.name] === "shared") {
+                    targetInstancePromise = target.findAll().then(function (targetInstances) {
+                        return _.first(targetInstances);
+                    });
                 } else if (options[target.name] === null) {
                     return;
                 } else {

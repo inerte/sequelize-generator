@@ -444,6 +444,27 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should create instances with a shared foreign key, if option is set", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelFather = sequelize.define("ModelFather", {}),
+            ModelMother = sequelize.define("ModelMother", {}),
+            ModelCommonAncestor = sequelize.define("ModelCommonAncestor", {});
+
+        ModelChild.belongsTo(ModelFather);
+        ModelChild.belongsTo(ModelMother);
+
+        ModelFather.belongsTo(ModelCommonAncestor);
+        ModelMother.belongsTo(ModelCommonAncestor);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                ModelCommonAncestor: "shared"
+            }).then(function (child) {
+                assert.strictEqual(child.generator.ModelFather.ModelCommonAncestorId, child.generator.ModelMother.ModelCommonAncestorId);
+            });
+        }).then(done, done);
+    });
+
     it("should create record with NULL on fields that reference parents when foreignKeyConstraint is true", function (done) {
         // Only the creation gets NULL. SequelizeG later calls instance.setModelParent(parentInstance) which will
         // replace NULL by parentInstance primary key
