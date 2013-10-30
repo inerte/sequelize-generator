@@ -92,6 +92,22 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         }
     }
 
+    function getSetterMethod(association, instance) {
+        if (association.accessors && association.accessors.set) {
+            return instance[association.accessors.set];
+        } else {
+            // setterName code copied straight from Sequelize
+            // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
+            var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(association.target.tableName, association.options.language)));
+
+            if (instance[setterName]) {
+                return instance[setterName];
+            } else if (instance[setterName + "s"]) {
+                return instance[setterName + "s"];
+            }
+        }
+    }
+
     return instancesIfNeeded(sequelizeModelOrInstance).then(function (instances) {
         var instance;
 
@@ -173,24 +189,10 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 }
 
                 return targetInstancePromise.then(function (targetInstance) {
-                    var setterMethod;
+                    var setterMethod = getSetterMethod(association, instance);
 
-                    if (association.accessors && association.accessors.set) {
-                        setterMethod = instance[association.accessors.set];
-
-                        if (association.associationType === "HasMany") {
-                            targetInstance = [targetInstance];
-                        }
-                    } else {
-                        // setterName code copied straight from Sequelize
-                        // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
-                        var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(target.tableName, association.options.language)));
-
-                        if (instance[setterName]) {
-                            setterMethod = instance[setterName];
-                        } else if (instance[setterName + "s"]) {
-                            setterMethod = instance[setterName + "s"];
-                        }
+                    if (association.associationType === "HasMany") {
+                        targetInstance = [targetInstance];
                     }
 
                     instance.generator[target.name] = targetInstance;
