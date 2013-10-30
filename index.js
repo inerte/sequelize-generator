@@ -165,11 +165,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
 
                 targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes, associationIdentifiers);
 
-                if (options[target.name] && options[target.name] === "any") {
-                    targetInstancePromise = target.findAll().then(function (targetInstances) {
-                        return _.sample(targetInstances);
-                    });
-                } else if (options[target.name] && options[target.name] === "shared") {
+                if (options[target.name] && options[target.name] === "shared") {
                     targetInstancePromise = target.findAll().then(function (targetInstances) {
                         if (targetInstances.length === 0) {
                             return target.create(targetAttributes);

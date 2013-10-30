@@ -419,31 +419,6 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
-    it("should set a foreign key to a random, already created record, if option is set", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {}),
-            ModelParent = sequelize.define("ModelParent", {});
-
-        ModelChild.belongsTo(ModelParent);
-
-        sync().then(function () {
-            var chainer = new Sequelize.Utils.QueryChainer();
-
-            _.times(3, function () {
-                chainer.add(ModelParent.create());
-            });
-
-            return chainer.run();
-        }).then(function (parents) {
-            var parentIds = _.pluck(parents, "id");
-
-            return new SequelizeG(ModelChild, {
-                ModelParent: "any"
-            }).then(function (child) {
-                assert.ok(_.contains(parentIds, child.ModelParentId));
-            });
-        }).then(done, done);
-    });
-
     it("should create instances with a shared foreign key, if option is set", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelFather = sequelize.define("ModelFather", {}),

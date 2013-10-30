@@ -146,6 +146,4 @@ new SequelizeG(Model, {
 });
 ```
 
-If you want a random, already created, record to be selected as parent, pass {ModelParent: "any"} as an option. See test "should set a foreign key to a random, already created record, if option is set".
-
 If you want every instance to share a common ancestor, pass {ModelName: "shared"} as an option. See test "should create instances with a shared foreign key, if option is set".
