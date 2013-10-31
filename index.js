@@ -172,10 +172,6 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 return targetInstancePromise.then(function (targetInstance) {
                     var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(association.target.tableName, association.options.language)));
 
-                    if (association.associationType === "HasMany") {
-                        targetInstance = [targetInstance];
-                    }
-
                     instance.generator[target.name] = targetInstance;
 
                     return instance[setterName].call(instance, targetInstance).then(function () {
