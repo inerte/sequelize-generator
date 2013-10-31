@@ -2,6 +2,7 @@
 
 var _ = require("lodash"),
     Sequelize = require("sequelize"),
+    guard = require("when/guard"),
     when = require("when");
 
 module.exports = function G(sequelizeModelOrInstance, options) {
@@ -182,13 +183,15 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     });
                 });
             }).then(function (targetInstances) {
-                return when.map(targetInstances, function (targetInstance) {
+                var guardedAsyncOperation = guard(guard.n(1), function (targetInstance) {
                     if (targetInstance && !_.isEmpty(targetInstance.daoFactory.associations)) {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;
                     }
                 });
+
+                return when.map(targetInstances, guardedAsyncOperation);
             }).then(function () {
                 return options.rootInstance;
             });
