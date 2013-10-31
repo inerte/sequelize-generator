@@ -93,6 +93,16 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         }
     }
 
+    function firstOrCreate(instance, attributes) {
+        return instance.findAll().then(function (instances) {
+            if (instances.length === 0) {
+                return instance.create(attributes);
+            } else {
+                return _.first(instances);
+            }
+        })
+    }
+
     return instancesIfNeeded(sequelizeModelOrInstance).then(function (instances) {
         var instance;
 
@@ -148,13 +158,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes, associationIdentifiers);
 
                 if (options[target.name] && options[target.name] === "shared") {
-                    targetInstancePromise = target.findAll().then(function (targetInstances) {
-                        if (targetInstances.length === 0) {
-                            return target.create(targetAttributes);
-                        } else {
-                            return _.first(targetInstances);
-                        }
-                    });
+                    targetInstancePromise = firstOrCreate(target, targetAttributes);
                 } else if (options[target.name] === null) {
                     return;
                 } else {
