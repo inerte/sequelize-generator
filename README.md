@@ -146,4 +146,5 @@ new SequelizeG(Model, {
 });
 ```
 
-If you want every instance to share a common ancestor, pass {ModelName: "shared"} as an option. See test "should create instances with a shared foreign key, if option is set".
+If you want every instance to share a common ancestor, pass {ModelName: "shared"} as an option. See test "should create instances with a shared foreign key, if option is set". The shared option will try to use the first record of ModelName. If one is not found, it will be created, and then found when the second
+instance attempts to use the shared common ancestor.
