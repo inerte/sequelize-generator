@@ -102,24 +102,21 @@ module.exports = function G(sequelizeModelOrInstance, options) {
             options.number = options.number - instances.length;
 
             return when.map(instances, function (instance) {
+                // This part should be refactored with bulkCreateArgument.push's from instancesIfNeeded()
+                var attributes = {};
+
+                _.forEach(options.attributes, function (value, key) {
+                    if (_.isArray(value)) { // If value is an array, we consume the first element
+                        attributes[key] = value.shift();
+                    } else if (_.isFunction(value)) { // If value is a function, execute it
+                        attributes[key] = value();
+                    } else {
+                        attributes[key] = value;
+                    }
+                });
+
                 var optionsCopy = _.clone(options);
-
-                if (originalNumber > 0) {
-                    // This part should be refactored with bulkCreateArgument.push's from instancesIfNeeded()
-                    var attributes = {};
-
-                    _.forEach(options.attributes, function (value, key) {
-                        if (_.isArray(value)) { // If value is an array, we consume the first element
-                            attributes[key] = value.shift();
-                        } else if (_.isFunction(value)) { // If value is a function, execute it
-                            attributes[key] = value();
-                        } else {
-                            attributes[key] = value;
-                        }
-                    });
-
-                    optionsCopy.attributes = attributes;
-                }
+                optionsCopy.attributes = attributes;
 
                 return new G(instance, optionsCopy);
             });
