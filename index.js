@@ -36,7 +36,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     }
 
     function setDefaultAttributesValue(rawAttributes, customValues, associationIdentifiers) {
-        var attributes = _.clone(customValues) || {};
+        var attributes = _.clone(customValues);
 
         _(rawAttributes)
         // Removes from rawAttributes any attributes from customValues. We want user-passed values to take precedence
