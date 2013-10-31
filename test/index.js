@@ -419,6 +419,27 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should accept as an attribute a function that returns the value to be set, even for multiple instances", function (done) {
+        var Model = sequelize.define("Model", {
+            name: Sequelize.STRING
+        }),
+            name = "Julio";
+
+        sync().then(function () {
+            return new SequelizeG(Model, {
+                number: 2,
+                attributes: {
+                    name: function () {
+                        return name;
+                    }
+                }
+            }).then(function (instance) {
+                assert.strictEqual(name, instance[0].name);
+                assert.strictEqual(name, instance[1].name);
+            });
+        }).then(done, done);
+    });
+
     it("should create instances with a shared foreign key, if option is set", function (done) {
         var ModelChild = sequelize.define("ModelChild", {}),
             ModelFather = sequelize.define("ModelFather", {}),
