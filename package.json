@@ -12,15 +12,15 @@
         "node": ">=0.10.11"
     },
     "dependencies": {
-        "lodash": "~2.3.0",
+        "lodash": "~2.4.0",
         "sequelize": "~2.0.0-beta.1",
         "when": "~2.6.0"
     },
     "devDependencies": {
         "jshint": "~2.3.0",
         "mocha": "~1.14.0",
-        "istanbul": "~0.1.44",
-        "mysql": "~2.0.0-alpha8"
+        "istanbul": "~0.1.45",
+        "mysql": "~2.0.0-alpha9"
     },
     "homepage": "https://github.com/inerte/sequelize-generator",
     "keywords": [
