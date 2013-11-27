@@ -462,6 +462,22 @@ describe("Sequelize generator", function () {
         }).then(done, done);
     });
 
+    it("should create instances with a shared foreign key, if option is set, even for multiple number", function (done) {
+        var ModelChild = sequelize.define("ModelChild", {}),
+            ModelParent = sequelize.define("ModelParent", {});
+
+        ModelChild.belongsTo(ModelParent);
+
+        sync().then(function () {
+            return new SequelizeG(ModelChild, {
+                number: 2,
+                ModelParent: "shared",
+            }).then(function (children) {
+                assert.strictEqual(children[0].generator.ModelParent.values.id, children[1].generator.ModelParent.values.id);
+            });
+        }).then(done, done);
+    });
+
     it("should create record with NULL on fields that reference parents when foreignKeyConstraint is true", function (done) {
         // Only the creation gets NULL. SequelizeG later calls instance.setModelParent(parentInstance) which will
         // replace NULL by parentInstance primary key

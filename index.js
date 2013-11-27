@@ -111,7 +111,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
 
             options.number = options.number - instances.length;
 
-            return when.map(instances, function (instance) {
+            var guardedAsyncOperation = guard(guard.n(1), function (instance) {
                 // This part should be refactored with bulkCreateArgument.push's from instancesIfNeeded()
                 var attributes = {};
 
@@ -130,6 +130,8 @@ module.exports = function G(sequelizeModelOrInstance, options) {
 
                 return new G(instance, optionsCopy);
             });
+
+            return when.map(instances, guardedAsyncOperation);
         } else {
             instance = instances[0];
         }
