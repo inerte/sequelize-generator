@@ -12,9 +12,9 @@
         "node": ">=0.10.11"
     },
     "dependencies": {
-        "lodash": "~2.4.0",
+        "lodash": "~2.4.1",
         "sequelize": "~2.0.0-beta.1",
-        "when": "~2.6.0"
+        "when": "~2.7.0"
     },
     "devDependencies": {
         "jshint": "~2.3.0",
