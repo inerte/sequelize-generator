@@ -18,8 +18,8 @@
     },
     "devDependencies": {
         "jshint": "~2.3.0",
-        "mocha": "~1.14.0",
-        "istanbul": "~0.1.45",
+        "mocha": "~1.15.1",
+        "istanbul": "~0.2.0",
         "mysql": "~2.0.0-alpha9"
     },
     "homepage": "https://github.com/inerte/sequelize-generator",
