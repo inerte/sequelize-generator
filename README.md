@@ -29,25 +29,25 @@ You can, from ModelChild, create every parent level above:
 ```js
 new SequelizeG(ModelChild).then(function (child) {
     return child.getModelFather().then(function (father) {
-        assert.strictEqual(father.daoFactoryName, ModelFather.name);
+        assert.strictEqual(father.Model.name, ModelFather.name);
         return father.getModelPaternalGrandFather().then(function (paternalGrandFather) {
-            assert.strictEqual(paternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
+            assert.strictEqual(paternalGrandFather.Model.name, ModelPaternalGrandFather.name);
 
             return father.getModelPaternalGrandMother();
         }).then(function (paternalGrandMother) {
-            assert.strictEqual(paternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+            assert.strictEqual(paternalGrandMother.Model.name, ModelPaternalGrandMother.name);
 
             return child;
         });
     }).then(function (child) {
         return child.getModelMother().then(function (mother) {
-            assert.strictEqual(mother.daoFactoryName, ModelMother.name);
+            assert.strictEqual(mother.Model.name, ModelMother.name);
             return mother.getModelMaternalGrandFather().then(function (maternalGrandFather) {
-                assert.strictEqual(maternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
+                assert.strictEqual(maternalGrandFather.Model.name, ModelMaternalGrandFather.name);
 
                 return mother.getModelMaternalGrandMother();
             }).then(function (maternalGrandMother) {
-                assert.strictEqual(maternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
+                assert.strictEqual(maternalGrandMother.Model.name, ModelMaternalGrandMother.name);
 
                 return null;
             });
@@ -60,14 +60,14 @@ Phew! That's a lot of promises. This is ok for production code, but for tests, w
 
 ```js
 new SequelizeG(ModelChild).then(function (child) {
-    assert.strictEqual(child.generator.ModelFather.daoFactoryName, ModelFather.name);
-    assert.strictEqual(child.generator.ModelMother.daoFactoryName, ModelMother.name);
+    assert.strictEqual(child.generator.ModelFather.Model.name, ModelFather.name);
+    assert.strictEqual(child.generator.ModelMother.Model.name, ModelMother.name);
 
-    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
-    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandFather.Model.name, ModelPaternalGrandFather.name);
+    assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandMother.Model.name, ModelPaternalGrandMother.name);
 
-    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
-    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
+    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandFather.Model.name, ModelMaternalGrandFather.name);
+    assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandMother.Model.name, ModelMaternalGrandMother.name);
 });
 ```
 
@@ -84,7 +84,7 @@ var ModelChild = sequelize.define("ModelChild", {}),
 new SequelizeG(ModelChild, {
     ModelGrandParent: null
 }).then(function (child) {
-    assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+    assert.strictEqual(child.generator.ModelParent.Model.name, ModelParent.name);
     assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
 });
 ```
@@ -102,8 +102,8 @@ new SequelizeG(Model, {
 
     assert.strictEqual(2, children.length);
 
-    assert.strictEqual(childA.daoFactoryName, Model.name);
-    assert.strictEqual(childB.daoFactoryName, Model.name);
+    assert.strictEqual(childA.Model.name, Model.name);
+    assert.strictEqual(childB.Model.name, Model.name);
 
     assert.notStrictEqual(childA.id, childB.id);
 });
