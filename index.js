@@ -175,7 +175,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 return targetInstancePromise.then(function (targetInstance) {
                     // setterName code copied straight from Sequelize
                     // https://github.com/sequelize/sequelize/blob/0299ce638fc13ad79a50cd0714f274143babaf29/lib/associations/belongs-to.js#L71
-                    var setterName = Sequelize.Utils._.camelize("set_" + (association.options.as || Sequelize.Utils.singularize(association.target.tableName, association.options.language)));
+                    var setterName = Sequelize.Utils._.camelize("set_" + (association.as || Sequelize.Utils.singularize(association.target.tableName, association.options.language)));
 
                     instance.generator[target.name] = targetInstance;
 
