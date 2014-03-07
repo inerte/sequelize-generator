@@ -13,14 +13,14 @@
     },
     "dependencies": {
         "lodash": "~2.4.1",
-        "sequelize": "~2.0.0-beta.2",
-        "when": "~2.7.0"
+        "sequelize": "=2.0.0-beta.2",
+        "when": "~2.8.0"
     },
     "devDependencies": {
-        "jshint": "~2.3.0",
-        "mocha": "~1.15.1",
-        "istanbul": "~0.2.0",
-        "mysql": "~2.0.0-alpha9"
+        "jshint": "~2.4.4",
+        "mocha": "~1.17.1",
+        "istanbul": "~0.2.6",
+        "mysql": "~2.1.0"
     },
     "homepage": "https://github.com/inerte/sequelize-generator",
     "keywords": [
