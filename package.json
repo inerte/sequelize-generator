@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "lodash": "~2.4.1",
-        "sequelize": "=2.0.0-dev5",
+        "sequelize": "=2.0.0-dev10",
         "when": "~2.8.0"
     },
     "devDependencies": {

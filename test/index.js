@@ -37,7 +37,7 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelWithoutRelationship).then(function (modelChild) {
-                assert.strictEqual(modelChild.daoFactoryName, ModelWithoutRelationship.name);
+                assert.strictEqual(modelChild.Model.name, ModelWithoutRelationship.name);
             });
         }).then(done, done);
     });
@@ -52,7 +52,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return child.getModelParent();
             }).then(function (parent) {
-                assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(parent.Model.name, ModelParent.name);
             });
         }).then(done, done);
     });
@@ -74,7 +74,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return when.all(parentModels.map(function (ParentModel, i) {
                     return child["getModelParent" + i]().then(function (parentI) {
-                        assert.strictEqual(parentI.daoFactoryName, parentModels[i].name);
+                        assert.strictEqual(parentI.Model.name, parentModels[i].name);
 
                         return i; // Used as a counter on the length assert below
                     });
@@ -97,13 +97,13 @@ describe("Sequelize generator", function () {
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return child.getModelParent().then(function (parent) {
-                    assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                    assert.strictEqual(parent.Model.name, ModelParent.name);
 
                     return parent;
                 });
             }).then(function (parent) {
                 return parent.getModelGrandParent().then(function (grandParent) {
-                    assert.strictEqual(grandParent.daoFactoryName, ModelGrandParent.name);
+                    assert.strictEqual(grandParent.Model.name, ModelGrandParent.name);
                 });
             });
         }).then(done, done);
@@ -126,7 +126,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(modelsGenerations[0]).then(function (model0) {
                 return when.reduce(modelsGenerations, function (currentResult, value, index, total) {
                     if (index < total - 1) {
-                        assert.strictEqual(currentResult.daoFactoryName, value.name);
+                        assert.strictEqual(currentResult.Model.name, value.name);
                         return currentResult["getModel" + (index + 1)]();
                     } else {
                         return total;
@@ -161,26 +161,26 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 // Check father and paternal grandparents
                 return child.getModelFather().then(function (father) {
-                    assert.strictEqual(father.daoFactoryName, ModelFather.name);
+                    assert.strictEqual(father.Model.name, ModelFather.name);
                     return father.getModelPaternalGrandFather().then(function (paternalGrandFather) {
-                        assert.strictEqual(paternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
+                        assert.strictEqual(paternalGrandFather.Model.name, ModelPaternalGrandFather.name);
 
                         return father.getModelPaternalGrandMother();
                     }).then(function (paternalGrandMother) {
-                        assert.strictEqual(paternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+                        assert.strictEqual(paternalGrandMother.Model.name, ModelPaternalGrandMother.name);
 
                         return child;
                     });
                 }).then(function (child) {
                     // Check mother and maternal grandparents
                     return child.getModelMother().then(function (mother) {
-                        assert.strictEqual(mother.daoFactoryName, ModelMother.name);
+                        assert.strictEqual(mother.Model.name, ModelMother.name);
                         return mother.getModelMaternalGrandFather().then(function (maternalGrandFather) {
-                            assert.strictEqual(maternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
+                            assert.strictEqual(maternalGrandFather.Model.name, ModelMaternalGrandFather.name);
 
                             return mother.getModelMaternalGrandMother();
                         }).then(function (maternalGrandMother) {
-                            assert.strictEqual(maternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
+                            assert.strictEqual(maternalGrandMother.Model.name, ModelMaternalGrandMother.name);
 
                             return null;
                         });
@@ -492,7 +492,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return child.getModelParent().then(function (parent) {
                     assert.strictEqual(child.ModelParentId, parent.id);
-                    assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                    assert.strictEqual(parent.Model.name, ModelParent.name);
                 });
             });
         }).then(done, done);
@@ -511,7 +511,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return child.getSomeName();
             }).then(function (parent) {
-                assert.strictEqual(parent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(parent.Model.name, ModelParent.name);
             });
         }).then(done, done);
     });
@@ -537,7 +537,7 @@ describe("Sequelize generator", function () {
             }).then(function (parent) {
                 return parent.getSomeOtherName();
             }).then(function (grandParent) {
-                assert.strictEqual(grandParent.daoFactoryName, ModelGrandParent.name);
+                assert.strictEqual(grandParent.Model.name, ModelGrandParent.name);
             }).then(done, done);
         });
     });
@@ -575,8 +575,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return ModelParent.find(child.ModelParentId).then(function (modelParent) {
                     return child.getModelParent().then(function (parent) {
-                        assert.strictEqual(parent.daoFactoryName, ModelParent.name);
-                        assert.strictEqual(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.strictEqual(parent.Model.name, ModelParent.name);
+                        assert.strictEqual(parent.Model.name, modelParent.Model.name);
                         assert.strictEqual(parent.id, modelParent.id);
 
                         return true;
@@ -597,8 +597,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 return ModelParent.find(child.ModelParentId).then(function (modelParent) {
                     return child.getModelParent().then(function (parent) {
-                        assert.strictEqual(parent.daoFactoryName, ModelParent.name);
-                        assert.strictEqual(parent.daoFactoryName, modelParent.daoFactoryName);
+                        assert.strictEqual(parent.Model.name, ModelParent.name);
+                        assert.strictEqual(parent.Model.name, modelParent.Model.name);
                         assert.strictEqual(parent.id, modelParent.id);
 
                         return true;
@@ -620,8 +620,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 assert.ok(_.has(child, "generator"));
 
-                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
-                assert.strictEqual(child.generator.ModelMother.daoFactoryName, ModelMother.name);
+                assert.strictEqual(child.generator.ModelParent.Model.name, ModelParent.name);
+                assert.strictEqual(child.generator.ModelMother.Model.name, ModelMother.name);
 
                 return true;
             });
@@ -640,8 +640,8 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild).then(function (child) {
                 assert.ok(_.has(child, "generator"));
 
-                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
-                assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent.daoFactoryName, ModelGrandParent.name);
+                assert.strictEqual(child.generator.ModelParent.Model.name, ModelParent.name);
+                assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent.Model.name, ModelGrandParent.name);
 
                 return true;
             });
@@ -668,14 +668,14 @@ describe("Sequelize generator", function () {
 
         sync().then(function () {
             return new SequelizeG(ModelChild).then(function (child) {
-                assert.strictEqual(child.generator.ModelFather.daoFactoryName, ModelFather.name);
-                assert.strictEqual(child.generator.ModelMother.daoFactoryName, ModelMother.name);
+                assert.strictEqual(child.generator.ModelFather.Model.name, ModelFather.name);
+                assert.strictEqual(child.generator.ModelMother.Model.name, ModelMother.name);
 
-                assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandFather.daoFactoryName, ModelPaternalGrandFather.name);
-                assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+                assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandFather.Model.name, ModelPaternalGrandFather.name);
+                assert.strictEqual(child.generator.ModelFather.generator.ModelPaternalGrandMother.Model.name, ModelPaternalGrandMother.name);
 
-                assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandFather.daoFactoryName, ModelMaternalGrandFather.name);
-                assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandMother.daoFactoryName, ModelMaternalGrandMother.name);
+                assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandFather.Model.name, ModelMaternalGrandFather.name);
+                assert.strictEqual(child.generator.ModelMother.generator.ModelMaternalGrandMother.Model.name, ModelMaternalGrandMother.name);
             });
         }).then(done, done);
     });
@@ -709,7 +709,7 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild, {
                 ModelGrandParent: null
             }).then(function (child) {
-                assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                assert.strictEqual(child.generator.ModelParent.Model.name, ModelParent.name);
                 assert.strictEqual(child.generator.ModelParent.generator.ModelGrandParent, undefined);
 
                 return child.getModelParent();
@@ -734,7 +734,7 @@ describe("Sequelize generator", function () {
 
                 // Each child is an instance of Model
                 children.forEach(function (child) {
-                    assert.strictEqual(child.daoFactoryName, Model.name);
+                    assert.strictEqual(child.Model.name, Model.name);
                 });
 
                 // Children ids are 1..7
@@ -760,7 +760,7 @@ describe("Sequelize generator", function () {
 
                 // Each child is an instance of Model
                 children.forEach(function (child) {
-                    assert.strictEqual(child.generator.ModelParent.daoFactoryName, ModelParent.name);
+                    assert.strictEqual(child.generator.ModelParent.Model.name, ModelParent.name);
                 });
 
                 // Children ids are 1..7
@@ -789,7 +789,7 @@ describe("Sequelize generator", function () {
                 var childA = children[0],
                     childB = children[1];
 
-                assert.strictEqual(childB.generator.ModelParent.generator.ModelPaternalGrandMother.daoFactoryName, ModelPaternalGrandMother.name);
+                assert.strictEqual(childB.generator.ModelParent.generator.ModelPaternalGrandMother.Model.name, ModelPaternalGrandMother.name);
                 assert.strictEqual(childA.generator.ModelParent.generator.ModelPaternalGrandFather, undefined);
             });
         }).then(done, done);

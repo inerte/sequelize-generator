@@ -143,7 +143,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
 
         instance.generator = {};
 
-        var associations = _.where(instance.daoFactory.associations, {
+        var associations = _.where(instance.Model.associations, {
             associationType: "BelongsTo"
         });
 
@@ -185,7 +185,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                 });
             }).then(function (targetInstances) {
                 var guardedAsyncOperation = guard(guard.n(1), function (targetInstance) {
-                    if (targetInstance && !_.isEmpty(targetInstance.daoFactory.associations)) {
+                    if (targetInstance && !_.isEmpty(targetInstance.Model.associations)) {
                         return new G(targetInstance, options);
                     } else {
                         return targetInstance;
