@@ -3,6 +3,14 @@
 
 Object instantiation for Sequelize models
 
+sequelize-generator instantiates objects based on Sequelize relationships. You give a "child" model (or even great...n-grandchild) and sequelize-generator creates the whole chain of parents, making them easily accessible via the .generator attribute. It is perfect for tests! Instead of painstakingly creating a single model and then one of its parents, remembering to assign the proper id, and then another parent and the grandparent... you just run:
+
+```js
+var child = sequelizeG(ModelName);
+```
+
+Read more below about some of sequelize-generator options.
+
 Let's say you have some complicated relationships:
 
 ```js
