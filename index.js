@@ -22,7 +22,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
 
         if (typeString === "ENUM") {
             return _.sample(attribute.values);
-        } else if (_.contains(["INTEGER", "SMALLINT UNSIGNED"], typeString)) {
+        } else if (_.includes(["INTEGER", "SMALLINT UNSIGNED"], typeString)) {
             return _.parseInt(_.uniqueId(), 10);
             // starts with VARCHAR( or CHAR(, or is TEXT
         } else if (typeString.indexOf("VARCHAR(") === 0 || typeString.indexOf("CHAR") === 0 || typeString === "TEXT") {
@@ -45,7 +45,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
         // Loop the remaining rawAttributes to set values according to its Sequelize data type
         .forEach(function (value, key) {
             if (!_.has(value, "autoIncrement") && value.autoIncrement !== true) {
-                if (_.has(value, "references") || _.contains(associationIdentifiers, key)) {
+                if (_.has(value, "references") || _.includes(associationIdentifiers, key)) {
                     attributes[key] = null;
                 } else {
                     var valueToPopulate = valueBasedOnAttribute(value);
@@ -62,7 +62,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
     function instancesIfNeeded(sequelizeModelOrInstance) {
         // It is a model, create the instance
         if (sequelizeModelOrInstance.tableName) {
-            var associationIdentifiers = _.pluck(sequelizeModelOrInstance.associations, "identifier"),
+            var associationIdentifiers = _.map(sequelizeModelOrInstance.associations, "identifier"),
                 bulkCreateArgument = [];
 
             for (var i = 0; i < options.number; i++) {
@@ -155,7 +155,7 @@ module.exports = function G(sequelizeModelOrInstance, options) {
                     targetAttributes = options[target.name] && options[target.name].attributes || {},
                     targetInstancePromise;
 
-                var associationIdentifiers = _.pluck(target.associations, "identifier");
+                var associationIdentifiers = _.map(target.associations, "identifier");
 
                 targetAttributes = setDefaultAttributesValue(target.rawAttributes, targetAttributes, associationIdentifiers);
 

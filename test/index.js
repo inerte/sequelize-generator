@@ -17,7 +17,7 @@ describe("Sequelize generator", function () {
     afterEach(function () {
         // Undo the model definition or it hangs on the sequelize object, infecting
         // subsequent tests
-        var daoNames = _.pluck(sequelize.daoFactoryManager.daos, "name");
+        var daoNames = _.map(sequelize.daoFactoryManager.daos, "name");
 
         daoNames.forEach(function (daoName) {
             sequelize.daoFactoryManager.removeDAO(sequelize.daoFactoryManager.getDAO(daoName));
@@ -351,7 +351,7 @@ describe("Sequelize generator", function () {
                     name: names
                 }
             }).then(function (children) {
-                assert.deepEqual(_.pluck(children, "name"), names);
+                assert.deepEqual(_.map(children, "name"), names);
             });
         }).then(done, done);
     });
@@ -372,8 +372,8 @@ describe("Sequelize generator", function () {
                     profession: professions,
                 }
             }).then(function (children) {
-                assert.deepEqual(_.pluck(children, "name"), names);
-                assert.deepEqual(_.pluck(children, "profession"), professions);
+                assert.deepEqual(_.map(children, "name"), names);
+                assert.deepEqual(_.map(children, "profession"), professions);
             });
         }).then(done, done);
     });
@@ -392,10 +392,10 @@ describe("Sequelize generator", function () {
             return new SequelizeG(ModelChild, {
                 number: 2,
                 attributes: {
-                    ModelParentId: _.pluck(parents, "id")
+                    ModelParentId: _.map(parents, "id")
                 }
             }).then(function (children) {
-                assert.deepEqual(_.pluck(children, "ModelParentId"), _.pluck(parents, "id"));
+                assert.deepEqual(_.map(children, "ModelParentId"), _.map(parents, "id"));
             });
         }).then(done, done);
     });
@@ -738,7 +738,7 @@ describe("Sequelize generator", function () {
                 });
 
                 // Children ids are 1..7
-                assert.deepEqual(_.pluck(children, "id"), _.range(1, number + 1));
+                assert.deepEqual(_.map(children, "id"), _.range(1, number + 1));
             });
         }).then(done, done);
     });
@@ -764,7 +764,7 @@ describe("Sequelize generator", function () {
                 });
 
                 // Children ids are 1..7
-                assert.deepEqual(_.pluck(children, "id"), _.range(1, number + 1));
+                assert.deepEqual(_.map(children, "id"), _.range(1, number + 1));
             });
         }).then(done, done);
     });

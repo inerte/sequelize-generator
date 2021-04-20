@@ -16,7 +16,7 @@ describe("Sequelize generator data type fields pre-population", function () {
     afterEach(function () {
         // Undo the model definition or it hangs on the sequelize object, infecting
         // subsequent tests
-        var daoNames = _.pluck(sequelize.daoFactoryManager.daos, "name");
+        var daoNames = _.map(sequelize.daoFactoryManager.daos, "name");
 
         daoNames.forEach(function (daoName) {
             sequelize.daoFactoryManager.removeDAO(sequelize.daoFactoryManager.getDAO(daoName));
@@ -71,7 +71,7 @@ describe("Sequelize generator data type fields pre-population", function () {
 
         sync().then(function () {
             return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.contains(possibleValues, instance.name));
+                assert.ok(_.includes(possibleValues, instance.name));
             });
         }).then(done, done);
     });

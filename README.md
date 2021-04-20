@@ -131,7 +131,7 @@ new SequelizeG(Model, {
         name: names
     }
 }).then(function (children) {
-    assert.deepEqual(_.pluck(children, "name"), names);
+    assert.deepEqual(_.map(children, "name"), names);
 });
 ```
 
