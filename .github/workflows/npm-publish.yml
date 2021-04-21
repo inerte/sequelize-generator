@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
 
     services:
       mysql:
@@ -29,9 +32,6 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
-    env:
-      DB_PORT: ${{ job.services.mysql.ports[3306] }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
 
   publish-npm:
     needs: build
