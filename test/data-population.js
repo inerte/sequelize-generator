@@ -1,160 +1,138 @@
-var _ = require("lodash"),
-    Sequelize = require("sequelize"),
-    SequelizeG = require("../index.js"),
-    assert = require("assert");
+const _ = require('lodash');
+const Sequelize = require('sequelize');
+const assert = require('assert');
+const SequelizeG = require('../index.js');
 
-var sequelize = new Sequelize("myapp_test",
-    "travis",
-    "", {
-        dialect: "mysql",
-        logging: false,
-        port: process.env.DB_PORT,
+const sequelize = new Sequelize('myapp_test',
+  'root',
+  '', {
+    dialect: 'mysql',
+    logging: false,
+    port: process.env.DB_PORT,
+  });
+
+describe('Sequelize generator data type fields pre-population', () => {
+  afterEach(() => {
+    // Undo the model definition or it hangs on the sequelize object, infecting
+    // subsequent tests
+    const daoNames = _.map(sequelize.daoFactoryManager.daos, 'name');
+
+    daoNames.forEach((daoName) => {
+      sequelize.daoFactoryManager.removeDAO(sequelize.daoFactoryManager.getDAO(daoName));
+    });
+  });
+
+  const sync = function sync() {
+    return sequelize.getQueryInterface().dropAllTables().then(() => sequelize.sync({
+      force: true,
+    }));
+  };
+
+  it('should populate INTEGER with integers on child model', () => {
+    const Model = sequelize.define('Model', {
+      number: Sequelize.INTEGER,
     });
 
-describe("Sequelize generator data type fields pre-population", function () {
-    "use strict";
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isNumber(instance.number));
+    }));
+  });
 
-    afterEach(function () {
-        // Undo the model definition or it hangs on the sequelize object, infecting
-        // subsequent tests
-        var daoNames = _.map(sequelize.daoFactoryManager.daos, "name");
-
-        daoNames.forEach(function (daoName) {
-            sequelize.daoFactoryManager.removeDAO(sequelize.daoFactoryManager.getDAO(daoName));
-        });
+  it('should populate INTEGER with integers on parent models', () => {
+    const ModelChild = sequelize.define('ModelChild', {});
+    const ModelParent = sequelize.define('ModelParent', {
+      number: Sequelize.INTEGER,
     });
 
-    var sync = function () {
-        return sequelize.getQueryInterface().dropAllTables().then(function () {
-            return sequelize.sync({
-                force: true
-            });
-        });
-    };
+    ModelChild.belongsTo(ModelParent);
 
-    it("should populate INTEGER with integers on child model", function (done) {
-        var Model = sequelize.define("Model", {
-            number: Sequelize.INTEGER
-        });
+    return sync().then(() => new SequelizeG(ModelChild)
+      .then((child) => child.getModelParent())
+      .then((parent) => {
+        assert.ok(_.isNumber(parent.number));
+      }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isNumber(instance.number));
-            });
-        }).then(done, done);
+  it('should populate ENUM with any value from its possible values', () => {
+    const possibleValues = ['Julio', 'José'];
+    const Model = sequelize.define('Model', {
+      name: {
+        type: Sequelize.ENUM,
+        values: possibleValues,
+      },
     });
 
-    it("should populate INTEGER with integers on parent models", function (done) {
-        var ModelChild = sequelize.define("ModelChild", {}),
-            ModelParent = sequelize.define("ModelParent", {
-                number: Sequelize.INTEGER
-            });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.includes(possibleValues, instance.name));
+    }));
+  });
 
-        ModelChild.belongsTo(ModelParent);
-
-        sync().then(function () {
-            return new SequelizeG(ModelChild).then(function (child) {
-                return child.getModelParent();
-            }).then(function (parent) {
-                assert.ok(_.isNumber(parent.number));
-            });
-        }).then(done, done);
+  it('should populate STRING with random string', () => {
+    const Model = sequelize.define('Model', {
+      name: Sequelize.STRING,
     });
 
-    it("should populate ENUM with any value from its possible values", function (done) {
-        var possibleValues = ["Julio", "José"],
-            Model = sequelize.define("Model", {
-                name: {
-                    type: Sequelize.ENUM,
-                    values: possibleValues
-                }
-            });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isString(instance.name));
+      assert.ok(instance.name.length > 0);
+    }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.includes(possibleValues, instance.name));
-            });
-        }).then(done, done);
+  it('should populate STRING(n) with random string', () => {
+    const Model = sequelize.define('Model', {
+      name: Sequelize.STRING(42),
     });
 
-    it("should populate STRING with random string", function (done) {
-        var Model = sequelize.define("Model", {
-            name: Sequelize.STRING
-        });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isString(instance.name));
+      assert.ok(instance.name.length > 0);
+    }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isString(instance.name));
-                assert.ok(instance.name.length > 0);
-            });
-        }).then(done, done);
+  it('should populate CHAR with random string', () => {
+    const Model = sequelize.define('Model', {
+      name: 'CHAR',
     });
 
-    it("should populate STRING(n) with random string", function (done) {
-        var Model = sequelize.define("Model", {
-            name: Sequelize.STRING(42)
-        });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isString(instance.name));
+      assert.ok(instance.name.length > 0);
+    }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isString(instance.name));
-                assert.ok(instance.name.length > 0);
-            });
-        }).then(done, done);
+  it('should populate CHAR(n) with random string', () => {
+    const Model = sequelize.define('Model', {
+      name: 'CHAR(32)',
     });
 
-    it("should populate CHAR with random string", function (done) {
-        var Model = sequelize.define("Model", {
-            name: "CHAR"
-        });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isString(instance.name));
+      assert.ok(instance.name.length > 0);
+    }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isString(instance.name));
-                assert.ok(instance.name.length > 0);
-            });
-        }).then(done, done);
+  it('should populate SMALLINT UNSIGNED with random number', () => {
+    const Model = sequelize.define('Model', {
+      number: 'SMALLINT UNSIGNED',
     });
 
-    it("should populate CHAR(n) with random string", function (done) {
-        var Model = sequelize.define("Model", {
-            name: "CHAR(32)"
-        });
+    return sync().then(() => new SequelizeG(Model).then((instance) => {
+      assert.ok(_.isNumber(instance.number));
+    }));
+  });
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isString(instance.name));
-                assert.ok(instance.name.length > 0);
-            });
-        }).then(done, done);
+  it('should populate fields with unique characters when number option is set', () => {
+    const Model = sequelize.define('Model', {
+      name: Sequelize.STRING,
     });
 
-    it("should populate SMALLINT UNSIGNED with random number", function (done) {
-        var Model = sequelize.define("Model", {
-            number: "SMALLINT UNSIGNED"
-        });
+    return sync().then(() => new SequelizeG(Model, {
+      number: 2,
+    }).then((instances) => {
+      const instanceA = instances[0];
+      const instanceB = instances[1];
 
-        sync().then(function () {
-            return new SequelizeG(Model).then(function (instance) {
-                assert.ok(_.isNumber(instance.number));
-            });
-        }).then(done, done);
-    });
-
-    it("should populate fields with unique characters when number option is set", function (done) {
-        var Model = sequelize.define("Model", {
-            name: Sequelize.STRING
-        });
-
-        sync().then(function () {
-            return new SequelizeG(Model, {
-                number: 2,
-            }).then(function (instances) {
-                var instanceA = instances[0],
-                    instanceB = instances[1];
-
-                assert.notStrictEqual(instanceA.name, instanceB.name);
-            });
-        }).then(done, done);
-    });
+      assert.notStrictEqual(instanceA.name, instanceB.name);
+    }));
+  });
 });
