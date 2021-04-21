@@ -37,5 +37,5 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
-    env:
-      DB_PORT: ${{ job.services.mysql.ports[3306] }}
+        env:
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
