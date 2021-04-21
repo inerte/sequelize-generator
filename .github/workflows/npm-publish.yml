@@ -31,6 +31,7 @@ jobs:
       - run: npm test
     env:
       DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
 
   publish-npm:
     needs: build

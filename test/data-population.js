@@ -1,10 +1,12 @@
+require('dotenv').config();
+
 const _ = require('lodash');
 const Sequelize = require('sequelize');
 const assert = require('assert');
 const SequelizeG = require('../index.js');
 
 const sequelize = new Sequelize('myapp_test',
-  'root',
+  process.env.DB_USERNAME,
   '', {
     dialect: 'mysql',
     logging: false,
