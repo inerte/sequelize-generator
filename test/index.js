@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var _ = require("lodash"),
     Sequelize = require("sequelize"),
     SequelizeG = require("../index.js"),
@@ -8,7 +10,8 @@ var sequelize = new Sequelize("myapp_test",
     "travis",
     "", {
         dialect: "mysql",
-        logging: false
+        logging: false,
+        port: process.env.DB_PORT,
     });
 
 describe("Sequelize generator", function () {

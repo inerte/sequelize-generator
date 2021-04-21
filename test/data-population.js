@@ -7,7 +7,8 @@ var sequelize = new Sequelize("myapp_test",
     "travis",
     "", {
         dialect: "mysql",
-        logging: false
+        logging: false,
+        port: process.env.DB_PORT,
     });
 
 describe("Sequelize generator data type fields pre-population", function () {
