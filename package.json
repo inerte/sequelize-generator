@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "dotenv": "=8.2.0",
-        "lodash": "=3.0.1",
+        "lodash": "=4.17.21",
         "sequelize": "=2.0.0-dev10",
         "when": "=2.8.0"
     },
