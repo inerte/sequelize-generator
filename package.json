@@ -22,7 +22,7 @@
         "eslint-config-airbnb-base": "=14.2.1",
         "eslint-plugin-import": "=2.22.1",
         "istanbul": "=0.2.6",
-        "mocha": "=8.0.1",
+        "mocha": "=8.4.0",
         "mysql": "=2.18.1"
     },
     "homepage": "https://github.com/inerte/sequelize-generator",
